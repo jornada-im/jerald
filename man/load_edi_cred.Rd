@@ -15,5 +15,5 @@ edicred - a list containing metabase credentials
 }
 \description{
 This function reads credentials for an EDI user into the edicred
-variable.
+list variable.
 }

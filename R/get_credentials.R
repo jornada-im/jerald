@@ -1,22 +1,21 @@
-#' Get Metabase credentials
+#' Get LTER Metabase credentials
 #'
 #' This function reads credentials for an LTER Metabase into the mbcred
-#' variable.
+#' list variable.
 #'
 #' @param pathname Complete path (including filename) to your metabase
 #' credentials
 #' @return mbcred - a list containing metabase credentials
 #' @export
 load_metabase_cred <- function(pathname){
-	# Get metadata from metabase
+	# Source the file
   source(pathname)
-	#return(mbcred)
 }
 
 #' Get EDI credentials
 #'
 #' This function reads credentials for an EDI user into the edicred
-#' variable.
+#' list variable.
 #'
 #' @param path Path to the 'edi_keys.R' file containing your EDI credentials
 #' credentials
@@ -25,7 +24,6 @@ load_metabase_cred <- function(pathname){
 load_edi_cred <- function(path){
   # Source the file
   source(paste0(path, 'edi_keys.R'))
-  #return(edicred)
 }
 
 #' Get s3 bucket API keys
@@ -39,5 +37,4 @@ load_edi_cred <- function(path){
 load_s3_cred <- function(path){
   # Source the file
   source(paste0(path, 's3_keys.R'))
-  #return(edicred)
 }

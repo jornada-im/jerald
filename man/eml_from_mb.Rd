@@ -2,7 +2,7 @@
 % Please edit documentation in R/eml.R
 \name{eml_from_mb}
 \alias{eml_from_mb}
-\title{EML metadata from metabase}
+\title{Create EML list from an LTER metabase}
 \usage{
 eml_from_mb(pkgid, dbname, dbcred)
 }
@@ -14,8 +14,9 @@ eml_from_mb(pkgid, dbname, dbcred)
 \item{dbcred}{Credentials for the database (a list)}
 }
 \value{
-An EML-formatted list of metadata
+An EML-schema-formatted list of metadata
 }
 \description{
-This function queries a metabase and formats metadata to the EML spec
+This function queries an LTER metabase and formats the metadata into an
+R list in the EML schema
 }

@@ -2,20 +2,22 @@
 % Please edit documentation in R/eml.R
 \name{update_revnum_edi}
 \alias{update_revnum_edi}
-\title{Update EML revision number from EDI}
+\title{Update EML revision numbers using EDI repository}
 \usage{
 update_revnum_edi(eml.list, edienv = "staging")
 }
 \arguments{
-\item{eml.list}{EML metadata list}
+\item{eml.list}{R list of EML-schema-formatted metadata}
 
 \item{edienv}{Name of EDI repository environment ('staging', 'production',
 or 'development')}
 }
 \value{
-An EML-formatted list of metadata (with revised revnum)
+An EML-schema-formatted list of metadata with revised package
+revision numbers.
 }
 \description{
 This function queries the EDI repository to retrieve the current
-revision number for a data package and updates an EML list accordingly
+revision number for a data package there, and then updates an EML
+list accordingly.
 }

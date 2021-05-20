@@ -20,5 +20,5 @@ development)}
 This function takes an EDI package identifier and updates the package on EDI.
 The correspondingly named EML document must be present in the working
 directory. NOTE that if this isn't working one might have to upload EML
-(but not data) at portal.edirepository.org
+and data at portal-s.edirepository.org
 }

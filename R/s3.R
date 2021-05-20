@@ -1,8 +1,9 @@
 #' Put entities in an S3 bucket
 #'
-#' This function takes a list of data entities and uploads to an s3 bucket
+#' This function takes a list of data entities and uploads them to an s3 
+#' bucket
 #'
-#' @param ents A list of filenames
+#' @param ents A list of dataTable or otherEntity filenames
 #' @param bucketname Name of the s3 bucket to upload to
 #' @export
 ents_to_s3 <- function(ents, bucketname){
@@ -18,10 +19,11 @@ ents_to_s3 <- function(ents, bucketname){
 
 #' Remove entities from S3 bucket
 #'
-#' This function takes a list of data entities and uploads to an s3 bucket
+#' This function takes a list of data entities and deletes them from an s3 
+#' bucket
 #'
-#' @param ents A list of filenames
-#' @param bucketname Name of the s3 bucket to upload to
+#' @param ents A list of dataTable or otherEntity filenames in an s3 bucket
+#' @param bucketname Name of the s3 bucket to modify
 #' @export
 remove_ents_s3 <- function(ents, bucketname){
 	for (fname in ents) {

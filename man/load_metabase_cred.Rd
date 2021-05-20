@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_credentials.R
 \name{load_metabase_cred}
 \alias{load_metabase_cred}
-\title{Get Metabase credentials}
+\title{Get LTER Metabase credentials}
 \usage{
 load_metabase_cred(pathname)
 }
@@ -15,5 +15,5 @@ mbcred - a list containing metabase credentials
 }
 \description{
 This function reads credentials for an LTER Metabase into the mbcred
-variable.
+list variable.
 }

@@ -7,11 +7,13 @@
 get_entities(eml.list)
 }
 \arguments{
-\item{eml.list}{An EML list object}
+\item{eml.list}{An EML-schema-formatted R list}
 }
 \value{
-A list of filenames
+A list of data entity filenames found in the EML
 }
 \description{
-This function extracts the filenames for dataTables and otherEntities
+This function extracts the data entity filenames (dataTables and
+otherEntities) from an EML-schema-formatted list and returns a vector
+of the filenames (useful for upload to s3 buckets).
 }
