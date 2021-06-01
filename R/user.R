@@ -83,7 +83,7 @@ dataset_update_edi <- function(datasetid,
   # Collect the data entities from the eml list & push to s3 bucket
   ents <- get_eml_entities(eml.dsid.new)
   print
-  ents_to_s3(ents)
+  ents_to_s3(ents, bucket.name)
   
   # Update package on EDI
   edi_update_package(eml.dsid.new$packageId, edi.cred, edi.env=edi.env)

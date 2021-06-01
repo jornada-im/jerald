@@ -3,27 +3,26 @@
 #' This function queries an LTER metabase and formats the metadata into an
 #' R list in the EML schema
 #'
-#' @param pkgid Number or numeric vector of dataset IDs to query
-#' @param dbname Name of the database ('metabase') to query metadata from
-#' @param dbcred Credentials for the database (a list)
+#' @param datasetid Number or numeric vector of dataset IDs to query
+#' @param mb.name Name of the LTER metabase to query metadata from
+#' @param mb.cred Credentials for mb.name (a list, see `load_metabase_cred`)
 #' @return An EML-schema-formatted list of metadata
 #' @export
-eml_from_mb <- function(pkgid, dbname, dbcred){
+eml_from_mb <- function(datasetid, mb.name, mb.cred){
 	# Get metadata from metabase
 	metadata <- do.call(MetaEgress::get_meta,
-			    c(list(dbname = dbname,
-				   dataset_ids = c(pkgid)), # can be a vector
-			      mbcred)) # assigned in cred file}
+	                    c(list(dbname = mb.name,
+	                           dataset_ids = c(datasetid)), # can be a vector
+	                      mb.cred)) # assigned in cred file}
 	
 	# Create a list of entities formatted for the EML document
 	tables_pkg <- MetaEgress::create_entity_all(meta_list =  metadata,
-						    file_dir = getwd(),
-						    dataset_id = pkgid)
+	                                            file_dir = getwd(),
+	                                            dataset_id = datasetid)
 	# Create an EML schema list object
-	eml.list <- MetaEgress::create_EML(
-					   meta_list = metadata,
-					   entity_list = tables_pkg,
-					   dataset_id = pkgid)
+	eml.list <- MetaEgress::create_EML(meta_list = metadata,
+	                                   entity_list = tables_pkg,
+	                                   dataset_id = datasetid)
 	return(eml.list)
 }
 
@@ -34,41 +33,41 @@ eml_from_mb <- function(pkgid, dbname, dbcred){
 #' list accordingly.
 #'
 #' @param eml.list R list of EML-schema-formatted metadata
-#' @param edienv Name of EDI repository environment ('staging', 'production',
+#' @param edi.env Name of EDI repository environment ('staging', 'production',
 #' or 'development')
 #' @return An EML-schema-formatted list of metadata with revised package 
 #' revision numbers.
 #' @export
-update_revnum_edi <- function(eml.list, edienv='staging'){
-	# Get the scope, packageid, and revision number
-	emlpkgid <- eml.list$packageId
-	scope <- unlist(strsplit(emlpkgid, ".", fixed=TRUE))[1]
-	pkgid <- unlist(strsplit(emlpkgid, ".", fixed=TRUE))[2]
-	rev.db <- unlist(strsplit(emlpkgid, ".", fixed=TRUE))[3]
+update_eml_revnum_edi <- function(eml.list, edi.env='staging'){
+	# Get the scope, packageid, and revision number 
+	id.eml <- eml.list$packageId
+	scope <- unlist(strsplit(id.eml, ".", fixed=TRUE))[1]
+	datasetid <- unlist(strsplit(id.eml, ".", fixed=TRUE))[2]
+	rev <- unlist(strsplit(id.eml, ".", fixed=TRUE))[3]
 
 	# get the current revision number on EDI and increment by one,
 	# then update in metadata list with the next revision number
 	rev.edi <- EDIutils::api_list_data_package_revisions(scope,
-							  pkgid,
+							  datasetid,
 							  filter='newest',
-							  environment=edienv)
+							  environment=edi.env)
 	if (is.na(as.numeric(rev.edi))){
 		    print(paste("WARNING: new data package in environment",
-				edienv, ", revision will equal 1."))
+				edi.env, ", revision will equal 1."))
 		    rev.edi <- 0
 	}
 	rev.next <- as.numeric(rev.edi) + 1
 
 	# Create packageID
-	emlpkgid.next <- paste0(scope, "." , pkgid, ".", rev.next)
+	id.eml.next <- paste0(scope, "." , datasetid, ".", rev.next)
 	# Create new eml.list with the new emlpkgid.next
 	eml.list.next <- eml.list
-	eml.list.next$packageId <- emlpkgid.next
+	eml.list.next$packageId <- id.eml.next
 
 	return(eml.list.next)
 }
 
-#' Get dataTable and otherEntity filenames
+#' Get dataTable and otherEntity filenames from EML
 #'
 #' This function extracts the data entity filenames (dataTables and 
 #' otherEntities) from an EML-schema-formatted list and returns a vector
@@ -77,7 +76,7 @@ update_revnum_edi <- function(eml.list, edienv='staging'){
 #' @param eml.list An EML-schema-formatted R list
 #' @return A list of data entity filenames found in the EML
 #' @export
-get_entities <- function(eml.list){
+get_eml_entities <- function(eml.list){
 	# Get dataTable filenames from EML
 	entlist <- c()
 	if (length(eml.list$dataset$dataTable) > 0){
