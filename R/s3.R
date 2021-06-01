@@ -6,7 +6,7 @@
 #' @param ents A list of dataTable or otherEntity filenames
 #' @param bucketname Name of the s3 bucket to upload to
 #' @export
-ents_to_s3 <- function(ents, bucket.name{
+ents_to_s3 <- function(ents, bucket.name){
 	for (fname in ents) {
 		print(paste("Pushing", fname, "to", bucket.name,
 			    "s3 bucket..."))
