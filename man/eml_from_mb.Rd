@@ -4,14 +4,14 @@
 \alias{eml_from_mb}
 \title{Create EML list from an LTER metabase}
 \usage{
-eml_from_mb(pkgid, dbname, dbcred)
+eml_from_mb(datasetid, mb.name, mb.cred)
 }
 \arguments{
-\item{pkgid}{Number or numeric vector of dataset IDs to query}
+\item{datasetid}{Number or numeric vector of dataset IDs to query}
 
-\item{dbname}{Name of the database ('metabase') to query metadata from}
+\item{mb.name}{Name of the LTER metabase to query metadata from}
 
-\item{dbcred}{Credentials for the database (a list)}
+\item{mb.cred}{Credentials for mb.name (a list, see \code{load_metabase_cred})}
 }
 \value{
 An EML-schema-formatted list of metadata

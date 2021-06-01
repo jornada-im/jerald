@@ -4,7 +4,7 @@
 \alias{remove_ents_s3}
 \title{Remove entities from S3 bucket}
 \usage{
-remove_ents_s3(ents, bucketname)
+remove_ents_s3(ents, bucket.name)
 }
 \arguments{
 \item{ents}{A list of dataTable or otherEntity filenames in an s3 bucket}
