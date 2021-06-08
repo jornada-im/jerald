@@ -8,13 +8,13 @@
 #' @export
 ents_to_s3 <- function(ents, bucket.name){
 	for (fname in ents) {
-		print(paste("Pushing", fname, "to", bucket.name,
-			    "s3 bucket..."))
+		message("Pushing ", fname, " to ", bucket.name, " s3 bucket...")
 		out <- aws.s3::put_object(fname, fname, bucket.name,
-					  acl='public-read', verbose=TRUE,
+					  acl='public-read', verbose=FALSE,
 		show_progress=TRUE)
-		print(out) # Should print TRUE if successful
+		message(out) # Should print TRUE if successful
 	}
+  message('Done.\n')
 }
 
 #' Remove entities from S3 bucket
@@ -27,10 +27,10 @@ ents_to_s3 <- function(ents, bucket.name){
 #' @export
 remove_ents_s3 <- function(ents, bucket.name){
 	for (fname in ents) {
-		print(paste("Removing", fname, "from", bucket.name,
-			    "s3 bucket..."))
+		message("Removing ", fname, " from ", bucket.name, "s3 bucket...")
 		out <- aws.s3::delete_object(fname, bucket.name, verbose=TRUE,
 		show_progress=TRUE)
-		print(out) # Should print TRUE if successful
+		message(out) # Should print TRUE if successful
 	}
+  message('Done.\n')
 }

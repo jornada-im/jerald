@@ -13,11 +13,13 @@
 #' development)
 #' @export
 edi_create_package <- function(packageid, edi.cred, edi.env='staging'){
+  message('Creating new package ', packageid, ' at EDI ', edi.env, '...')
 	do.call(EDIutils::api_create_data_package,
 	        c(list(path = getwd(),        # current directory
 	               package.id = packageid, # package id
 	               environment = edi.env),# EDI environment
 	          edi.cred))
+	message('Done.\n')
 	# The above should be equivalent to:
 	# api_create_data_package(path=getwd(),package.id = packageid,
 	# 			  environment = edi.env,
@@ -40,11 +42,13 @@ edi_create_package <- function(packageid, edi.cred, edi.env='staging'){
 #' development)
 #' @export
 edi_update_package <- function(packageid, edi.cred, edi.env='staging'){
+  message('Updating package ', packageid, ' at EDI ', edi.env, '...')
   do.call(EDIutils::api_update_data_package,
           c(list(path = getwd(),        # current directory
                  package.id = packageid, # package id
                  environment = edi.env),# EDI environment
             edi.cred))
+  message('Done.\n')
   # The above should be equivalent to:
   # api_update_data_package(path=getwd(),package.id = packageid,
   # 			  environment = edi.env,

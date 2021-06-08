@@ -10,20 +10,25 @@
 #' @export
 eml_from_mb <- function(datasetid, mb.name, mb.cred){
 	# Get metadata from metabase
+  message('Collecting metadata for ', datasetid, ' from LTER Metabase ',
+              mb.name, '...')
 	metadata <- do.call(MetaEgress::get_meta,
 	                    c(list(dbname = mb.name,
 	                           dataset_ids = c(datasetid)), # can be a vector
 	                      mb.cred)) # assigned in cred file}
 	
 	# Create a list of entities formatted for the EML document
+	message('Generating entity table for ', datasetid, '...')
 	tables_pkg <- MetaEgress::create_entity_all(meta_list =  metadata,
 	                                            file_dir = getwd(),
 	                                            dataset_id = datasetid)
 	# Create an EML schema list object
+	message('Creating EML schema list...')
 	eml.list <- MetaEgress::create_EML(meta_list = metadata,
 	                                   entity_list = tables_pkg,
 	                                   dataset_id = datasetid)
 	return(eml.list)
+	message('Done.\n')
 }
 
 #' Update EML revision numbers using EDI repository
@@ -47,13 +52,15 @@ update_eml_revnum_edi <- function(eml.list, edi.env='staging'){
 
 	# get the current revision number on EDI and increment by one,
 	# then update in metadata list with the next revision number
+	message('Checking revision number for ', datasetid, ' package in EDI ',
+	        edi.env, ' and adding 1...')
 	rev.edi <- EDIutils::api_list_data_package_revisions(scope,
 							  datasetid,
 							  filter='newest',
 							  environment=edi.env)
 	if (is.na(as.numeric(rev.edi))){
-		    print(paste("WARNING: new data package in environment",
-				edi.env, ", revision will equal 1."))
+		    warning('New data package in environment ', edi.env,
+		            ', revision will equal 1.')
 		    rev.edi <- 0
 	}
 	rev.next <- as.numeric(rev.edi) + 1
@@ -65,6 +72,7 @@ update_eml_revnum_edi <- function(eml.list, edi.env='staging'){
 	eml.list.next$packageId <- id.eml.next
 
 	return(eml.list.next)
+	message('Done.\n')
 }
 
 #' Get dataTable and otherEntity filenames from EML
