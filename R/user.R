@@ -30,7 +30,7 @@ load_destination_cred <- function(path){
 #' This function updates an existing dataset (or "data package") at the EDI
 #' research data repository using metadata derived from an LTER Metabase. 
 #' The user must supply credentials for the metabase and EDI (see 
-#' `load_metabase_cred` and `load_destination_dred` functions), and
+#' `load_metabase_cred` and `load_destination_cred` functions), and
 #' appropriate database and EDI environment names.
 #' 
 #' The basic process is to
@@ -64,29 +64,36 @@ update_dataset_edi <- function(datasetid,
   # Collect metadata into EML list from JRN metabase (using MetaEgress)
   eml.list <- eml_from_mb(datasetid, mb.name, mb.cred)
   # Revision number in metabase
-  rev.mb <- unlist(strsplit(eml.list$packageID, ".", fixed=TRUE))[3]
+  rev.mb <- unlist(strsplit(eml.list$packageId, ".", fixed=TRUE))[3]
+  rev.mb <- as.numeric(rev.mb)
   
   # Update the revision numbers using EDI
   eml.list.new <- update_eml_revnum_edi(eml.list, edi.env=edi.env)
-  rev.next <- unlist(strsplit(eml.list.new$packageID, ".", fixed=TRUE))[3]
+  rev.next <- unlist(strsplit(eml.list.new$packageId, ".", fixed=TRUE))[3]
+  rev.next <- as.numeric(rev.next)
   if (rev.next==1){
     stop("To create a new package in EDI ", edi.env, ", use the 
          `create_dataset_edi` function")
   }
   # Warn if the revisions on metabase and EDI don't match
-  if (rev.mb != (rev.next-1)){
+  if (rev.mb!=(rev.next-1)){
     warning("The metabase revision (", rev.mb, "), does not match the EDI ",
             edi.env, "revision (", rev.next-1, ").")
   }
   
-  # validate and serialize (write) EML document
+  # Validate and serialize (write) EML document
+  message('Validating EML...')
+  out <- EML::eml_validate(eml.list.new)
+  message(out)
   message('Writing EML...')
-  EML::eml_validate(eml.list.new)
-  EML::write_eml(eml.list.new, file = paste0(eml.list.new$packageId, ".xml"))
+  EML::write_eml(eml.list.new, file=paste0(eml.list.new$packageId, ".xml"))
   message('Done.\n')
   
   if (!publish){
-    stop("Stopping - to continue to publication pass argument `publish=TRUE`")
+    message('Stopping execution: the dataset will not be published')
+    message('Please check dataset identifiers, revision numbers, eml, etc.')
+    message('To continue to publication pass argument `publish=TRUE`. \n')
+    stop("Stopping", call.=FALSE)
   }
   
   # Collect the data entities from the eml list & push to s3 bucket
@@ -103,7 +110,7 @@ update_dataset_edi <- function(datasetid,
 #' This function creates a new dataset (or "data package") at the EDI
 #' research data repository using metadata derived from an LTER Metabase. 
 #' The user must supply credentials for the metabase and EDI (see 
-#' `load_metabase_cred` and `load_destination_dred` functions), and
+#' `load_metabase_cred` and `load_destination_cred` functions), and
 #' appropriate database and EDI environment names.
 #' 
 #' The basic process is to
@@ -137,11 +144,13 @@ create_dataset_edi <- function(datasetid,
   # Collect metadata into EML list from JRN metabase (using MetaEgress)
   eml.list <- eml_from_mb(datasetid, mb.name, mb.cred)
   # Revision number in metabase
-  rev.mb <- unlist(strsplit(eml.list$packageID, ".", fixed=TRUE))[3]
+  rev.mb <- unlist(strsplit(eml.list$packageId, ".", fixed=TRUE))[3]
+  rev.mb <- as.numeric(rev.mb)
   
   # Update the revision numbers using EDI
   eml.list.new <- update_eml_revnum_edi(eml.list, edi.env=edi.env)
-  rev.next <- unlist(strsplit(eml.list.new$packageID, ".", fixed=TRUE))[3]
+  rev.next <- unlist(strsplit(eml.list.new$packageId, ".", fixed=TRUE))[3]
+  rev.next <- as.numeric(rev.next)
   if (rev.next>1){
     stop("This package already exists at EDI ", edi.env, ". Use the
          `update_dataset_edi` function")
@@ -152,14 +161,19 @@ create_dataset_edi <- function(datasetid,
             edi.env, "revision (", rev.next-1, ").")
   }
   
-  # validate and serialize (write) EML document
+  # Validate and serialize (write) EML document
+  message('Validating EML...')
+  out <- EML::eml_validate(eml.list.new)
+  message(out)
   message('Writing EML...')
-  EML::eml_validate(eml.list.new)
-  EML::write_eml(eml.list.new, file = paste0(eml.list.new$packageId, ".xml"))
+  EML::write_eml(eml.list.new, file=paste0(eml.list.new$packageId, ".xml"))
   message('Done.\n')
   
   if (!publish){
-    stop("Stopping - to continue to publication pass argument `publish=TRUE`")
+    message('Stopping execution: the dataset will not be published')
+    message('Please check dataset identifiers, revision numbers, eml, etc.')
+    message('To continue to publication pass argument `publish=TRUE`. \n')
+    stop("Stopping", call.=FALSE)
   }
   
   # Collect the data entities from the eml list & push to s3 bucket
@@ -169,6 +183,7 @@ create_dataset_edi <- function(datasetid,
   # Update package on EDI
   edi_create_package(eml.list.new$packageId, edi.cred, edi.env=edi.env)
 }
+
 
 #' Create a dataset directory from a jerald template
 #'
@@ -181,6 +196,8 @@ create_dataset_edi <- function(datasetid,
 #' @export
 #' 
 template_dataset_dir <- function(datasetid, get.edi=FALSE){
+  
+  datasetid <- format(datasetid, scientific = FALSE)
   
   # Create dataset directory name
   user.shortname <- readline(paste0('Enter a short name to append to the ',

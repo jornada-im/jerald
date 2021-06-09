@@ -9,3 +9,5 @@ mbcred <- list(
   port = 5432,
   user = "yourusername",     # Add your Metabase username (leave quotes)
   password = "yourpassword") # Add your Metabase password (leave quotes)
+
+mbname <- "yourmetabasename" # Add the name of your Metabase (leave quotes)

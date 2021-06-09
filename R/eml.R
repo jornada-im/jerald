@@ -14,7 +14,7 @@ eml_from_mb <- function(datasetid, mb.name, mb.cred){
               mb.name, '...')
 	metadata <- do.call(MetaEgress::get_meta,
 	                    c(list(dbname = mb.name,
-	                           dataset_ids = c(datasetid)), # can be a vector
+	                           dataset_ids = c(datasetid)),
 	                      mb.cred)) # assigned in cred file}
 	
 	# Create a list of entities formatted for the EML document
@@ -27,8 +27,8 @@ eml_from_mb <- function(datasetid, mb.name, mb.cred){
 	eml.list <- MetaEgress::create_EML(meta_list = metadata,
 	                                   entity_list = tables_pkg,
 	                                   dataset_id = datasetid)
-	return(eml.list)
 	message('Done.\n')
+	return(eml.list)	
 }
 
 #' Update EML revision numbers using EDI repository
@@ -70,9 +70,9 @@ update_eml_revnum_edi <- function(eml.list, edi.env='staging'){
 	# Create new eml.list with the new emlpkgid.next
 	eml.list.next <- eml.list
 	eml.list.next$packageId <- id.eml.next
-
-	return(eml.list.next)
+	
 	message('Done.\n')
+	return(eml.list.next)
 }
 
 #' Get dataTable and otherEntity filenames from EML
