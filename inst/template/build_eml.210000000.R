@@ -29,8 +29,8 @@ id <- 210000000
 # EDI environment
 env <- 'staging'
 # Metabase, EDI, and s3 credential paths
-mbcred_path <- '~/Desktop/jrn_metabase_keys.R'
-destcred_path <- '/media/greg/jrn-DataProducts/LTER_IM/im-keys/'
+mbcred_path <- '/path/to/jrn_metabase_keys.R'
+destcred_path <- '/path/to/directory/containing/jerald_destination_keys.R/'
 
 # Get credentials for JRN metabase
 # template for this file: 
