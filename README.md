@@ -1,13 +1,16 @@
 # jerald
 
-This R package provides a workflow to manage and publish Jornada research datasets. It includes functions to harvest metadata from a metadata database, or "Metabase", create [EML](https://eml.ecoinformatics.org/) documents, and publish datasets to the [EDI data repository](https://portal.edirepository.org). The Metabase is expected to follow the [LTER-core-metabase](https://github.com/lter/LTER-core-metabase) schema,
+This R package provides a workflow and tools to manage and publish research datasets to online repositories. It includes functions to harvest metadata from a metadata database, or "Metabase", create [EML](https://eml.ecoinformatics.org/) documents, and publish datasets to the [EDI data repository](https://portal.edirepository.org). The Metabase is expected to follow the [LTER-core-metabase](https://github.com/lter/LTER-core-metabase) schema.
 
 `jerald` depends on a few required R packages:
 
 * [MetaEgress](https://github.com/BLE-LTER/MetaEgress) to access the Metabase
 * [aws.s3](https://cloud.r-project.org/web/packages/aws.s3/index.html)
 * [EDIutils](https://ediorg.github.io/EDIutils/)
-* ...and credentials to use Jornada resources.
+
+**It also requires credentials to use the Metabase and web resources.**
+
+The package was developed by the [Jornada LTER](https://lter.jornada.nmsu.edu), so `jerald` is a bit specific to LTER sites and their research data workflows. It should, however, be somewhat extensible for other sites and purposes.
 
 ## Installation
 
@@ -40,11 +43,11 @@ where `eal.dir` is the path to the EAL directory, and `jerald.dir` is the path t
 
 ### Building the dataset entities
 
-`jerald` doesn't do this directly yet, called `build_dataset.datasetid.R` that demonstrates how to prepare a tabular data entity. This template script will be created in any new `jerald` dataset directory (using `template_dataset_dir`) or can be found in `inst/template/`.
+`jerald` doesn't do this directly yet, but there is a template script called `build_dataset.datasetid.R` that demonstrates how to prepare a tabular data entity. This template script will be created in any new `jerald` dataset directory (using `template_dataset_dir`) or can be found in `inst/template/`.
 
 ### Update or create a dataset on EDI
 
-There currently two several user scripts for publishing data to EDI. The first step is to load credentials for your Metabase and web resources:
+There are several user functions for publishing data to EDI. The first step is to load credentials for your Metabase and web resources:
 
     load_metabase_cred(mb.pathname)
 
@@ -56,7 +59,7 @@ Once the credentials have been loaded you can create and upload datasets at EDI 
 
     update_dataset_edi(datasetid, mb.name, mb.cred, edi.cred)
 
-where `datasetid` is the unique identifier for the dataset in your Metabase and EDI; `mb.name` is the name of your Metabase and is returned by `load_metabase_cred`; `mb.cred` is a list of credentials for Metabase and is returned by `load_metabase_cred`; `edi.cred` is a list of credentials for EDI and is returned by `load_destination_cred`. For safety, the default arguments for this function do a "dry-run" of the process (no update to EDI), and will update the data package at the EDI "staging" repository. You can change both behaviors using the `edi.env` and `publish` arguments once you are sure you are ready to publish. Note that a dataset is called a data package in EDI terms.
+where `datasetid` is the unique identifier for the dataset in your Metabase and EDI; `mb.name` is the name of your Metabase and is returned by `load_metabase_cred`; `mb.cred` is a list of credentials for Metabase and is returned by `load_metabase_cred`; `edi.cred` is a list of credentials for EDI and is returned by `load_destination_cred`. For safety, the default arguments for this function will either do a "dry-run" of the process (no update to EDI), or will update the data package at the EDI "staging" repository. You can change both behaviors using the `edi.env` and `publish` arguments once you are sure you are ready to publish. Note that a dataset is called a data package in EDI terms.
 
 To create a new dataset on EDI use:
 
