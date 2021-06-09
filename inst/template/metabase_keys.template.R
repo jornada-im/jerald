@@ -11,3 +11,4 @@ mbcred <- list(
   password = "yourpassword") # Add your Metabase password (leave quotes)
 
 mbname <- "yourmetabasename" # Add the name of your Metabase (leave quotes)
+

@@ -69,4 +69,3 @@ unique(df.export$type)
 options(scipen=999)   # turns of scientific notation
 write.csv(df.export, f_out, quote=F, row.names=F)
 
-

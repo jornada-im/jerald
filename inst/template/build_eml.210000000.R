@@ -52,3 +52,4 @@ update_dataset_edi(id, mbname, mbcred, edicred, edi.env=env)
 
 # Clean up
 remove(mbcred, edicred, mbname, mbcred_path, destcred_path)
+

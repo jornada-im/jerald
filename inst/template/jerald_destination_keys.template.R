@@ -21,3 +21,4 @@ Sys.setenv("AWS_S3_ENDPOINT" = "s3 endpointaddress", # Add host address
            "AWS_SECRET_ACCESS_KEY" = "s3 secretkeystring", # Secret acces key
            "AWS_DEFAULT_REGION" = "region (if used)", # Region, eg us-west3
            "AWS_SESSION_TOKEN" = "") # Usually ok to leave blank
+

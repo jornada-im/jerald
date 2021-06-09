@@ -227,15 +227,15 @@ template_dataset_dir <- function(datasetid, get.edi=FALSE){
   }
   
   # List of jerald template names
-  jerald.templates <- c('README.md', 'abstract.datasetid.md',
-                      'methods.datasetid.md', 'build_dataset.datasetid.R',
-                      'build_eml.datasetid.R')
+  jerald.templates <- c('README.md', 'abstract.210000000.md',
+                      'methods.210000000.md', 'build_dataset.210000000.R',
+                      'build_eml.210000000.R')
   # Empty list to collect dataset templates
   dataset.templates <- c()
   # Get jerald templates, rename, and copy to new.dir
   for (t in jerald.templates){
     j.temp <- system.file('template', t, package='jerald')
-    new.temp <- sub('datasetid', as.character(datasetid), t)
+    new.temp <- sub('210000000', as.character(datasetid), t)
     new.temp <- file.path(new.dir, new.temp)
     file.copy(j.temp, new.temp)
     dataset.templates <- c(dataset.templates, new.temp)
