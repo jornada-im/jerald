@@ -7,13 +7,13 @@
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 #
 # !!!!!!!!!
-# When running this script on the shared drive it may be necessary to set the 
+# When running this script on a nework drive it may be necessary to set the 
 # path based on how you map the drive. i.e.:
 #
-# setwd('/Volumes/JornadaFiles/LTER_IM/NonCore_packages/210.../')
-# setwd('Z:\\DataProducts\LTER_IM....
+# setwd('/Volumes/unix/path/to/datasets/210.../')
+# setwd('Z:\\windows\path\to\datasets\210...\
 #
-# In rstudio this sets the working directory to the dir the script is in:
+# In rstudio, set the working directory to a path containing the script with:
 # setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 #
 # !!!!!!!!!
