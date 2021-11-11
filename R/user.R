@@ -18,7 +18,7 @@ load_metabase_cred <- function(pathname){
 #' in a jerald destination credentials file.
 #'
 #' @param path Path to the 'destination_keys.R' file containing API keys
-#' @return 1 if successful
+#' @return edicred - a list containing EDI credentials
 #' @export
 load_destination_cred <- function(path){
   # Source the file
@@ -253,22 +253,36 @@ template_dataset_dir <- function(datasetid, get.edi=FALSE){
 
 #' Migrate an EAL dataset directory to a jerald directory
 #'
-#' Create a new directory for a dataset with some template scripts,
-#' metadata files, useful subdirectories, and a readme file. Template
-#' files are in `jerald/inst/template/`.
+#' WARNING - this is fairly jornada-specific use at your own risk
 #'
-#' @param eal.dir Dataset directory, in EAL format, to migrate from
-#' @param jerald.dir Dataset directory, in jerald format, to migrate to
+#' This will move the files from an EMLassemblyline-formatted dataset directory
+#' to a jerald-formatted dataset directory (as described in
+#' `jerald/inst/template/`). The jerald-formatted destination should be
+#' created first using `jerald::template_dataset_dir()` using a name distinct
+#' from the source directory.
+#'
+#' All files from the EAL source directory will be copied into a new
+#' `EAL_archive/` directory in the jerald destination directory. Then, this
+#' function copies any "build" R scripts and data entities into the top level
+#' of the jerald directory, moves old metadata files (`.dsd`, etc) into 
+#' `metadata_docs/`, and moves EML files to `eml/`.
+#'
+#' Optionally you may remove the source dataset directory at the end but
+#' YOU SHOULD VERY CAREFULLY CHECK THE OUTPUT BEFORE ANSWERING YES! 
+#'
+#' @param eal.dir Source dataset directory, in EAL format, to migrate from
+#' @param jerald.dir Destination dataset directory, in jerald format, to
+#'                   migrate to
 #' @export
 #' 
 migrate_eal_dir <- function(eal.dir, jerald.dir){
   
-  message('WARNING - this function may remove data - be careful!')
+  message('\nWARNING - this function may remove data - be careful!!!')
   user.continue <- readline('Do you want to continue? (Y/n): ')
-  if (user.continue!='Y'){
+  if (tolower(user.continue)!='y'){
     stop('Aborting...')
   } else {
-    message('continuing...')
+    message('continuing...\n')
   }
   
   # Expand paths
@@ -280,7 +294,8 @@ migrate_eal_dir <- function(eal.dir, jerald.dir){
     stop(eal.dir, ' does not exist.')
   }
   if (!dir.exists(jerald.dir)){
-    stop(jerald.dir, ' does not exist.')
+    stop(jerald.dir, ' does not exist.\nCreate a jerald template directory',
+        ' before migrating.')
   } else {
     # If the jerald directory exists and has no EAL archive,
     # create one. If it has an EAL archive, abort.
@@ -295,43 +310,85 @@ migrate_eal_dir <- function(eal.dir, jerald.dir){
   # List EAL directory contents
   eal.files <- list.files(eal.dir, full.names=TRUE, include.dirs = TRUE)
   # Copy all files to EAL_archive
-  message('Copying all files from EAL directory to jerald EAL_archive...')
+  message('Copying all files from EAL_source to jerald_dest/EAL_archive/...')
   file.copy(eal.files, eal.archive, recursive=TRUE, copy.date=TRUE,
             copy.mode=TRUE)
   message('Done.\n')
   
+  # Move any data entities or warn if not found
   eal.entities <- file.path(eal.archive, 'data_entities')
   if (dir.exists(eal.entities)){
     eal.dataents <- list.files(eal.entities, full.names=TRUE)
-    message('Copy EAL data entities to parent/...')
+    message('Move EAL data entities to parent/...')
     file.copy(eal.dataents, jerald.dir, copy.date=TRUE, copy.mode=TRUE)
+    file.remove(eal.dataents)
     message('Done.\n')
+  }else{
+    message('Data entities directory not found!')
   }
+
   # Copy build script to top level
-  eal.buildscript <- list.files(eal.archive, pattern="(build_)*\\.(R)",
+  eal.buildscript <- list.files(eal.archive, pattern="(build_).*\\.R$",
                                 full.names=TRUE)
-  message('Copy EAL build script to parent/...')
+  print(eal.buildscript)
+  message('Move EAL build script to parent/...')
   file.copy(eal.buildscript, file.path(jerald.dir, 'build_EALarchive.R'),
             copy.date=TRUE, copy.mode=TRUE)
+  file.remove(eal.buildscript)
   message('Done.\n')
   
   # Copy metadata files to metadata_docs/
   eal.metadatafiles <- list.files(eal.archive,
                                   pattern="\\.(prj|dsd|his|PRJ|DSD|HIS)",
-                                  full.names=TRUE)
-  message('Copy prj, dsd, and his files to metadata_docs/...')
+                                  full.names=TRUE, recursive=TRUE)
+  print(eal.metadatafiles)
+  message('Move prj, dsd, and his files to metadata_docs/...')
   file.copy(eal.metadatafiles, file.path(jerald.dir, 'metadata_docs'),
             copy.date=TRUE, copy.mode=TRUE)
+  file.remove(eal.metadatafiles)
+  message('Done.\n')
+
+  # Copy metadata templates to metadata_docs/
+  eal.metadatatemp <- list.files(eal.archive,
+                                 pattern="(metadata_template).*\\.(docx|xlsx)",
+                                 full.names=TRUE, recursive=TRUE)
+  print(eal.metadatatemp)
+  message('Move metadata_template files to metadata_docs/...')
+  file.copy(eal.metadatatemp, file.path(jerald.dir, 'metadata_docs'),
+            copy.date=TRUE, copy.mode=TRUE)
+  file.remove(eal.metadatatemp)
+  message('Done.\n')
+
+  # Copy other R files to parent
+  eal.rscripts <- list.files(eal.archive,pattern="\\.R$",
+                             full.names=TRUE)
+  if(length(eal.rscripts > 0)){
+    print(eal.rscripts)
+    message('Additional R scripts are being moved to parent/')
+    file.copy(eal.rscripts, file.path(jerald.dir),
+              copy.date=TRUE, copy.mode=TRUE)
+    file.remove(eal.rscripts)
+    message('Done.\n')
+  }
+
+  # Copy EML files to eml (anything ending with .xml)
+  eal.EML <- list.files(eal.archive, pattern="\\.xml$",
+                        full.names=TRUE, recursive=TRUE)
+  print(eal.EML)
+  message('Move EML files to eml/...')
+  file.copy(eal.EML, file.path(jerald.dir, 'EML'),
+            copy.date=TRUE, copy.mode=TRUE)
+  file.remove(eal.EML)
   message('Done.\n')
   
+  
   # Remove the old directory?
-  user.remove <- readline(paste0('Remove the EAL dataset directory? ',
+  user.remove <- readline(paste0('Remove the EAL_source directory? ',
                                  '(check results first!) (Y/n): '))
-  if (user.remove=='Y'){
+  if (tolower(user.continue)!='y'){
     message('Removing ', eal.dir, ' ...')
     unlink(eal.dir, recursive = TRUE)
     message('Done.')
   }
   
 }
-  
