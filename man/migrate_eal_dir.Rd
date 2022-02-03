@@ -7,12 +7,27 @@
 migrate_eal_dir(eal.dir, jerald.dir)
 }
 \arguments{
-\item{eal.dir}{Dataset directory, in EAL format, to migrate from}
+\item{eal.dir}{Source dataset directory, in EAL format, to migrate from}
 
-\item{jerald.dir}{Dataset directory, in jerald format, to migrate to}
+\item{jerald.dir}{Destination dataset directory, in jerald format, to
+migrate to}
 }
 \description{
-Create a new directory for a dataset with some template scripts,
-metadata files, useful subdirectories, and a readme file. Template
-files are in \verb{jerald/inst/template/}.
+WARNING - this is fairly jornada-specific use at your own risk
+}
+\details{
+This will move the files from an EMLassemblyline-formatted dataset directory
+to a jerald-formatted dataset directory (as described in
+\verb{jerald/inst/template/}). The jerald-formatted destination should be
+created first using \code{jerald::template_dataset_dir()} using a name distinct
+from the source directory.
+
+All files from the EAL source directory will be copied into a new
+\verb{EAL_archive/} directory in the jerald destination directory. Then, this
+function copies any "build" R scripts and data entities into the top level
+of the jerald directory, moves old metadata files (\code{.dsd}, etc) into
+\verb{metadata_docs/}, and moves EML files to \verb{eml/}.
+
+Optionally you may remove the source dataset directory at the end but
+YOU SHOULD VERY CAREFULLY CHECK THE OUTPUT BEFORE ANSWERING YES!
 }

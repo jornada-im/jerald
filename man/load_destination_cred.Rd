@@ -10,7 +10,7 @@ load_destination_cred(path)
 \item{path}{Path to the 'destination_keys.R' file containing API keys}
 }
 \value{
-1 if successful
+edicred - a list containing EDI credentials
 }
 \description{
 This function reads credentials for any data repositories and s3 buckets

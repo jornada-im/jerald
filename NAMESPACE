@@ -2,6 +2,7 @@
 
 export(create_dataset_edi)
 export(edi_create_package)
+export(edi_login)
 export(edi_update_package)
 export(eml_from_mb)
 export(ents_to_s3)

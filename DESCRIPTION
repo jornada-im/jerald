@@ -1,18 +1,18 @@
 Package: jerald
-Title: Publish Jornada Datasets
-Version: 0.0.0.9000
+Title: Publish Jornada datasets with ease
+Version: 0.0.1.0
 Authors@R: 
     person(given = "Gregory",
            family = "Maurer",
            role = c("aut", "cre"),
            email = "gmaurer@nmsu.edu",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+           comment = c(ORCID = "0000-0002-3007-8058"))
+Description: An R package to assist with publishing Jornada research datasets.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Imports: 
     aws.s3,
     EDIutils,

@@ -86,7 +86,8 @@ update_dataset_edi <- function(datasetid,
   out <- EML::eml_validate(eml.list.new)
   message(out)
   message('Writing EML...')
-  EML::write_eml(eml.list.new, file=paste0(eml.list.new$packageId, ".xml"))
+  emlfile <- paste0(eml.list.new$packageId, ".xml")
+  EML::write_eml(eml.list.new, file=emlfile)
   message('Done.\n')
   
   if (!publish){
@@ -101,7 +102,7 @@ update_dataset_edi <- function(datasetid,
   ents_to_s3(ents, bucket.name)
   
   # Update package on EDI
-  edi_update_package(eml.list.new$packageId, edi.cred, edi.env=edi.env)
+  edi_update_package(emlfile, edi.cred, edi.env=edi.env)
 }
 
 
@@ -166,7 +167,8 @@ create_dataset_edi <- function(datasetid,
   out <- EML::eml_validate(eml.list.new)
   message(out)
   message('Writing EML...')
-  EML::write_eml(eml.list.new, file=paste0(eml.list.new$packageId, ".xml"))
+  emlfile <- paste0(eml.list.new$packageId, ".xml")
+  EML::write_eml(eml.list.new, file=emlfile)
   message('Done.\n')
   
   if (!publish){
@@ -181,7 +183,7 @@ create_dataset_edi <- function(datasetid,
   ents_to_s3(ents, bucket.name)
   
   # Update package on EDI
-  edi_create_package(eml.list.new$packageId, edi.cred, edi.env=edi.env)
+  edi_create_package(emlfile, edi.cred, edi.env=edi.env)
 }
 
 

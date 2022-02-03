@@ -54,10 +54,10 @@ update_eml_revnum_edi <- function(eml.list, edi.env='staging'){
 	# then update in metadata list with the next revision number
 	message('Checking revision number for ', datasetid, ' package in EDI ',
 	        edi.env, ' and adding 1...')
-	rev.edi <- EDIutils::api_list_data_package_revisions(scope,
+	rev.edi <- EDIutils::list_data_package_revisions(scope,
 							  datasetid,
 							  filter='newest',
-							  environment=edi.env)
+							  env=edi.env)
 	if (is.na(as.numeric(rev.edi))){
 		    warning('New data package in environment ', edi.env,
 		            ', revision will equal 1.')

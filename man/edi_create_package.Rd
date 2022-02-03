@@ -4,21 +4,22 @@
 \alias{edi_create_package}
 \title{Create EDI repository package}
 \usage{
-edi_create_package(packageid, edi.cred, edi.env = "staging")
+edi_create_package(eml_path, edi.cred, edi.env = "staging")
 }
 \arguments{
+\item{eml_path}{Path to an EML document for the new EDI data package
+Should include scope, packagid, and revision number (e.g.
+knb-lter-jrn.210000000.1)}
+
 \item{edi.cred}{EDI credentials in a list}
 
 \item{edi.env}{EDI repository environment (staging, production, or
 development)}
-
-\item{emlpkgid}{Package identifier for EML document and EDI data package.
-Should include scope, packagid, and revision number (e.g.
-knb-lter-jrn.210000000.1)}
 }
 \description{
-This function takes an EDI package identifier and creates the package on EDI.
-The correspondingly named EML document must be present in the working
-directory and must have revision number 1. NOTE that if this isn't working
-one might have to upload EML and data at portal-s.edirepository.org
+This function takes a path to an EML file (with an EDI package identifier)
+and creates the package in the given EDI environment (default is 'staging').
+The given EML document must be present in the working directory and must
+have revision number 1. NOTE that if this isn't working one might need
+to upload EML and data at portal-s.edirepository.org
 }
