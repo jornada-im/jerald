@@ -5,21 +5,14 @@
 # for EDI. You can safely remove this and other boilerplate
 # and use the rest to design a new R script for your data.
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-#
-# !!!!!!!!!
-# When running this script on a nework drive it may be necessary to set the 
-# path based on how you map the drive. i.e.:
-#
-# setwd('/Volumes/unix/path/to/datasets/210.../')
-# setwd('Z:\\windows\path\to\datasets\210...\
-#
-# In rstudio, set the working directory to a path containing the script with:
-# setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-#
-# !!!!!!!!!
 
-# Set the working directory (a local or network share path):
+
+# Set the working directory to a local or network share path
+# (this only works in RStudio). 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+# If this fails try something like these:
+# setwd('/Volumes/unix/path/to/datasets/210.../')
+# setwd('Z:\\windows\path\to\datasets\210...\)
 
 library(tidyverse)
 
@@ -29,18 +22,14 @@ dsource <- "./source_data/"
 # Output data file name
 f_out <- "JRN000000_mtcars.csv"
 
-# read in and write out mtcars (our example data) if it doesn't exist
-# df <- mtcars
-# write.csv(df, 'source_data/mtcars.csv')
-
-# Load data. Here we're using mtcars as an example, in reality something like:
+# read in mtcars (our example data)
+df_in <- mtcars
+# In reality do something like:
 # df_in <- read_csv(paste0(dsource, "npp_values_20200915.csv"), 
 #		  skip = 12, na = c('nan', '.', '-9999'))
 
-# Load mtcars, create a new column with the rownames, remove some columns,
-# and export a simplified dataframe as csv (without rownames)
-df_in <- read.csv('source_data/mtcars.csv', row.names=1)
-
+# Now create a new column with the rownames and remove some columns in
+# a data file for export
 df_in$type <- row.names(df_in)
 
 df.export <- df_in %>%
@@ -65,7 +54,7 @@ df.export <- df_in %>%
 sapply(df.export, function(x) sum(is.na(x)))
 unique(df.export$type)
 
-# Export df.export as a csv to current directory
+# Export df.export as a csv to current directory (no rownames or quoting)
 options(scipen=999)   # turns of scientific notation
 write.csv(df.export, f_out, quote=F, row.names=F)
 
