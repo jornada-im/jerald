@@ -54,16 +54,27 @@ update_eml_revnum_edi <- function(eml.list, edi.env='staging'){
 	# then update in metadata list with the next revision number
 	message('Checking revision number for ', datasetid, ' package in EDI ',
 	        edi.env, ' and adding 1...')
-	rev.edi <- EDIutils::list_data_package_revisions(scope,
-							  datasetid,
-							  filter='newest',
-							  env=edi.env)
-	if (is.na(as.numeric(rev.edi))){
-		    warning('New data package in environment ', edi.env,
-		            ', revision will equal 1.')
-		    rev.edi <- 0
-	}
+	rev.edi <- tryCatch(
+		{#Try to get data package revisions
+		EDIutils::list_data_package_revisions(scope,
+					datasetid,
+					filter='newest',
+					env=edi.env)},
+		error = function(cond) {
+			message(paste("There is no current package with this identifier: ", datasetid))
+			message(paste("This will create a new package in the EDI environment"))
+            message("Here's the original error message:")
+            message(cond)
+            # Choose a return value
+            return(0)
+		},
+		finally = {
+			message(paste("Done"))
+		}
+	)
+
 	rev.next <- as.numeric(rev.edi) + 1
+	message(paste("The next revision number for the package will be: ", rev.next))
 
 	# Create packageID
 	id.eml.next <- paste0(scope, "." , datasetid, ".", rev.next)
