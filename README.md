@@ -25,7 +25,7 @@ Once `jerald` is installed you will need to direct it to stored credentials for 
 
 ## IM tasks and relevant jerald functions
 
-`jerald` has several user-facing functions, described below, that will help accomplish most data management and publication tasks performed by information managers at the Jornada. A template script that uses these functions to update an example dataset (id=210000000) on EDI is provided when making a new dataset directory using the instructions below, or is available at `inst/template/build_eml.210000000.R`. This script gives a demonstration of a basic Jornada workflow.
+`jerald` has several user-facing functions, described below, that will help accomplish most data management and publication tasks performed by information managers at the Jornada. A template script that uses these functions to update an example dataset (id=999) on EDI is provided when making a new dataset directory using the instructions below, or is available at `inst/template/build_eml.999.R`. This script gives a demonstration of a basic Jornada workflow.
 
 ### Create a new dataset directory or migrate an older one
 
@@ -43,7 +43,7 @@ where `eal.dir` is the path to the EAL directory, and `jerald.dir` is the path t
 
 ### Building the dataset entities
 
-`jerald` doesn't do this directly yet, but there is a template script called `build_dataset.210000000.R` that demonstrates how to prepare a tabular data entity. This template script will be created in any new `jerald` dataset directory (using `template_dataset_dir`) or can be found in `inst/template/`.
+`jerald` doesn't do this directly yet, but there is a template script called `build_dataset.999.R` that demonstrates how to prepare a tabular data entity. This template script will be created in any new `jerald` dataset directory (using `template_dataset_dir`) or can be found in `inst/template/`.
 
 ### Update or create a dataset on EDI
 

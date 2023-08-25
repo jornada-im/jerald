@@ -1,10 +1,10 @@
-# build_eml.210000000.R
+# build_eml.999.R
 # 
 # BOILERPLATE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 # This is a template build script using R to prepare eml and 
 # send a dataset to EDI using the jerald R package. You need 
-# credentials for this to work, and there is a template credentials
-# file in jrn-metabase-utils repository.
+# credentials for this to work, and there is a template credential
+# file in `metabase_keys.template.R`.
 #
 # Required metadata documents (abstract, methods) and any data entity
 # files (CSVs, images, zipfiles etc.) must be in the directory with 
@@ -18,22 +18,22 @@
 # (this only works in RStudio). 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 # If this fails try something like these:
-# setwd('/Volumes/unix/path/to/datasets/210.../')
-# setwd('Z:\\windows\path\to\datasets\210...\)
+# setwd('/Volumes/unix/path/to/datasets/ds999.../')
+# setwd('Z:\\windows\path\to\datasets\ds999...\)
 
 options(scipen=999)   # turns off scientific notation
 
 library('jerald')
 
 # Dataset ID
-id <- 210000000
+id <- 999
 # EDI environment
 env <- 'staging'
 # Metabase, EDI, and s3 credential paths
-mbcred_path <- '/path/to/jrn_metabase_keys.R'
+mbcred_path <- '/path/to/metabase_keys.R'
 destcred_path <- '/path/to/directory/containing/jerald_destination_keys.R/'
 
-# Get credentials for JRN metabase
+# Get credentials for the Metabase
 # see a template for this file: 
 #   system.file('template', 'metabase_keys.template.R',
 #               package='jerald')

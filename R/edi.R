@@ -27,7 +27,7 @@ edi_login <- function(edi.cred){
 #'
 #' @param eml.path Path to an EML document for the new EDI data package
 #' Should include scope, packagid, and revision number (e.g. 
-#' knb-lter-jrn.210000000.1)
+#' knb-lter-jrn.999.1)
 #' @param edi.cred EDI credentials in a list
 #' @param edi.env EDI repository environment (staging, production, or 
 #' development)
@@ -63,7 +63,7 @@ edi_create_package <- function(eml.path, edi.cred, edi.env='staging'){
 #'
 #' @param eml.path Path to an EML document for the EDI data package.
 #' Should include scope, packagid, and revision number (e.g. 
-#' knb-lter-jrn.210000000.3)
+#' knb-lter-jrn.999.3)
 #' @param edi.cred EDI credentials in a list
 #' @param edi.env EDI repository environment (staging, production, or 
 #' development)

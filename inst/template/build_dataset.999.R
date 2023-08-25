@@ -1,4 +1,4 @@
-# build_dataset.210000000.R
+# build_dataset.999.R
 # 
 # BOILERPLATE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 # This is a template build script using R to prepare a dataset
@@ -11,8 +11,8 @@
 # (this only works in RStudio). 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 # If this fails try something like these:
-# setwd('/Volumes/unix/path/to/datasets/210.../')
-# setwd('Z:\\windows\path\to\datasets\210...\)
+# setwd('/Volumes/unix/path/to/datasets/ds999.../')
+# setwd('Z:\\windows\path\to\datasets\ds999...\)
 
 library(tidyverse)
 
@@ -20,7 +20,7 @@ library(tidyverse)
 dsource <- "./source_data/"
 
 # Output data file name
-f_out <- "JRN000000_mtcars.csv"
+f_out <- "ds999_mtcars.csv"
 
 # read in mtcars (our example data)
 df_in <- mtcars

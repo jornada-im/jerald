@@ -61,7 +61,7 @@ update_dataset_edi <- function(datasetid,
                                publish=FALSE,
                                bucket.name=Sys.getenv('AWS_S3_BUCKETNAME')){
   
-  # Collect metadata into EML list from JRN metabase (using MetaEgress)
+  # Collect metadata into EML list from Metabase (using MetaEgress)
   eml.list <- eml_from_mb(datasetid, mb.name, mb.cred)
   # Revision number in metabase
   rev.mb <- unlist(strsplit(eml.list$packageId, ".", fixed=TRUE))[3]
@@ -142,7 +142,7 @@ create_dataset_edi <- function(datasetid,
                                publish=FALSE,
                                bucket.name=Sys.getenv('AWS_S3_BUCKETNAME')){
   
-  # Collect metadata into EML list from JRN metabase (using MetaEgress)
+  # Collect metadata into EML list from Metabase (using MetaEgress)
   eml.list <- eml_from_mb(datasetid, mb.name, mb.cred)
   # Revision number in metabase
   rev.mb <- unlist(strsplit(eml.list$packageId, ".", fixed=TRUE))[3]
@@ -229,15 +229,15 @@ template_dataset_dir <- function(datasetid, get.edi=FALSE){
   }
   
   # List of jerald template names
-  jerald.templates <- c('README.md', 'abstract.210000000.md',
-                      'methods.210000000.md', 'build_dataset.210000000.R',
-                      'build_eml.210000000.R')
+  jerald.templates <- c('README.md', 'abstract.999.md',
+                      'methods.999.md', 'build_dataset.999.R',
+                      'build_eml.999.R')
   # Empty list to collect dataset templates
   dataset.templates <- c()
   # Get jerald templates, rename, and copy to new.dir
   for (t in jerald.templates){
     j.temp <- system.file('template', t, package='jerald')
-    new.temp <- sub('210000000', as.character(datasetid), t)
+    new.temp <- sub('999', as.character(datasetid), t)
     new.temp <- file.path(new.dir, new.temp)
     file.copy(j.temp, new.temp)
     dataset.templates <- c(dataset.templates, new.temp)
@@ -247,7 +247,7 @@ template_dataset_dir <- function(datasetid, get.edi=FALSE){
   for (t in dataset.templates){
     message('Creating template: ', t)
     x <- readLines(t)
-    y <- gsub("210000000", as.character(datasetid), x, fixed=TRUE)
+    y <- gsub("999", as.character(datasetid), x, fixed=TRUE)
     cat(y, file=t, sep="\n")
   }
   message('Done.\n')
