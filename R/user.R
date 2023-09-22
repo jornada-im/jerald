@@ -247,8 +247,9 @@ template_dataset_dir <- function(datasetid, get.edi=FALSE){
   for (t in dataset.templates){
     message('Creating template: ', t)
     x <- readLines(t)
-    y <- gsub("999", as.character(datasetid), x, fixed=TRUE)
-    cat(y, file=t, sep="\n")
+    y <- gsub("ds999", paste0('ds', as.character(datasetid)), x, fixed=TRUE)
+    y2 <- gsub("dataset.999", paste0('dataset.', as.character(datasetid)), y, fixed=TRUE)    
+    cat(y2, file=t, sep="\n")
   }
   message('Done.\n')
 }

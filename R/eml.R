@@ -26,7 +26,9 @@ eml_from_mb <- function(datasetid, mb.name, mb.cred){
 	message('Creating EML schema list...')
 	eml.list <- MetaEgress::create_EML(meta_list = metadata,
 	                                   entity_list = tables_pkg,
-	                                   dataset_id = datasetid)
+	                                   dataset_id = datasetid,
+	                                   expand_taxa = TRUE,
+	                                   skip_taxa = FALSE)
 	message('Done.\n')
 	return(eml.list)	
 }

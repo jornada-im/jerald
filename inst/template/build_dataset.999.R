@@ -26,7 +26,7 @@ f_out <- "ds999_mtcars.csv"
 df_in <- mtcars
 # In reality do something like:
 # df_in <- read_csv(paste0(dsource, "npp_values_20200915.csv"), 
-#		  skip = 12, na = c('nan', '.', '-9999'))
+#		  skip = 12, na = c('nan', '.', ''))
 
 # Now create a new column with the rownames and remove some columns in
 # a data file for export
