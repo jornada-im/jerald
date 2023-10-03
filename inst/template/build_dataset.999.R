@@ -55,6 +55,6 @@ sapply(df.export, function(x) sum(is.na(x)))
 unique(df.export$type)
 
 # Export df.export as a csv to current directory (no rownames or quoting)
-options(scipen=999)   # turns of scientific notation
+options(scipen=999)   # turns off scientific notation
 write.csv(df.export, f_out, quote=F, row.names=F)
 
