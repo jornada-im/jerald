@@ -4,7 +4,7 @@
 \alias{ents_to_s3}
 \title{Put entities in an S3 bucket}
 \usage{
-ents_to_s3(ents, bucket.name)
+ents_to_s3(ents, bucket.name, multi.part = FALSE)
 }
 \arguments{
 \item{ents}{A list of dataTable or otherEntity filenames}

@@ -19,13 +19,13 @@ eml_from_mb <- function(datasetid, mb.name, mb.cred){
 	
 	# Create a list of entities formatted for the EML document
 	message('Generating entity table for ', datasetid, '...')
-	tables_pkg <- MetaEgress::create_entity_all(meta_list =  metadata,
-	                                            file_dir = getwd(),
-	                                            dataset_id = datasetid)
+	entities <- MetaEgress::create_entity_all(meta_list =  metadata,
+	                                          file_dir = getwd(),
+	                                          dataset_id = datasetid)
 	# Create an EML schema list object
 	message('Creating EML schema list...')
 	eml.list <- MetaEgress::create_EML(meta_list = metadata,
-	                                   entity_list = tables_pkg,
+	                                   entity_list = entities,
 	                                   dataset_id = datasetid,
 	                                   expand_taxa = TRUE,
 	                                   skip_taxa = FALSE)

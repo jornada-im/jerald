@@ -187,6 +187,101 @@ create_dataset_edi <- function(datasetid,
 }
 
 
+#' Publish a dataset at the EDI repository
+#'
+#' This function publishes a dataset (or "data package") at the EDI
+#' research data repository using metadata derived from an LTER Metabase. 
+#' The user must supply credentials for the metabase and EDI (see 
+#' `load_metabase_cred` and `load_destination_cred` functions), and
+#' appropriate database and EDI environment names.
+#' 
+#' The basic process is to
+#' 
+#' 1. Pull metadata for the dataset from the metabase using `MetaEgress`
+#' 2. Query for the current dataset revision in the EDI environment
+#' 3. Write an EML document for the next revision to go to EDI
+#' 4. Push EML data entities from the working directory to an s3 bucket
+#' 5. Push the EML document to EDI, which triggers PASTA to pull data from
+#'    the s3 bucket and update the data package.
+#'
+#' @param datasetid ID number of the dataset to find in metabase and 
+#' update in EDI
+#' @param mb.cred list of credentials for the metabase postgres cluster
+#' @param mb.name name of the metabase database in the postgres cluster
+#' @param edi.cred list of credentials to use for EDI
+#' @param edi.env name of the EDI environment to update (staging, production,
+#' or development)
+#' @param dry.run boolean value - end before s3 upload if TRUE (default), 
+#' publish if FALSE
+#' @param skip.s3.upload boolean value - if TRUE skip uploading to the s3
+#' bucket (entities already there). Note that this does not current do a 
+#' check on whether entities are present or not. 
+#' @param bucket.name name of the s3 bucket to push data entities to
+#' @export
+publish_dataset_edi <- function(datasetid,
+                               mb.name,
+                               mb.cred,
+                               edi.cred,
+                               edi.env='staging',
+                               dry.run=TRUE,
+                               s3.upload=TRUE,
+                               multi.part=FALSE,
+                               bucket.name=Sys.getenv('AWS_S3_BUCKETNAME')){
+  
+  # Collect metadata into EML list from Metabase (using MetaEgress)
+  eml.list <- eml_from_mb(datasetid, mb.name, mb.cred)
+  # Revision number in metabase
+  rev.mb <- unlist(strsplit(eml.list$packageId, ".", fixed=TRUE))[3]
+  rev.mb <- as.numeric(rev.mb)
+  
+  # Update the revision numbers using EDI
+  eml.list.new <- update_eml_revnum_edi(eml.list, edi.env=edi.env)
+  rev.next <- unlist(strsplit(eml.list.new$packageId, ".", fixed=TRUE))[3]
+  rev.next <- as.numeric(rev.next)
+  if (rev.next>1){
+    pubflag <- 'update'
+    #stop("This package already exists at EDI ", edi.env, ". Use the
+    #     `update_dataset_edi` function")
+  }
+  # Warn if the revisions on metabase and EDI don't match
+  if (rev.mb != (rev.next-1)){
+    warning("The metabase revision (", rev.mb, "), does not match the EDI ",
+            edi.env, " revision (", rev.next-1, ").")
+  }
+  
+  # Validate and serialize (write) EML document
+  message('Validating EML...')
+  out <- EML::eml_validate(eml.list.new)
+  message(out)
+  message('Writing EML...')
+  emlfile <- paste0(eml.list.new$packageId, ".xml")
+  EML::write_eml(eml.list.new, file=emlfile)
+  message('Done.\n')
+  
+  if (dry.run){
+    message('Stopping because this is a dry run')
+    message('Please check dataset identifiers, revision numbers, eml, etc.')
+    message('To continue to publication pass argument `dry.run=FALSE`. \n')
+    stop("Stopping (dry run)", call.=FALSE)
+  }
+  
+  if (s3.upload){
+    # Collect the data entities from the eml list & push to s3 bucket
+    ents <- get_eml_entities(eml.list.new)
+    ents_to_s3(ents, bucket.name, multi.part=multi.part)
+  } else{
+    message('Skipping S3 upload: make sure data entity files are online ')
+    message('at the URL designated in <distribution>.')
+  }
+  # Create or update dataset
+  if (pubflag=='update'){
+    edi_update_package(emlfile, edi.cred, edi.env=edi.env)
+  } else {
+    edi_create_package(emlfile, edi.cred, edi.env=edi.env)
+  }
+}
+
+
 #' Create a dataset directory from a jerald template
 #'
 #' Create a new directory for a dataset with some template scripts,

@@ -6,12 +6,12 @@
 #' @param ents A list of dataTable or otherEntity filenames
 #' @param bucketname Name of the s3 bucket to upload to
 #' @export
-ents_to_s3 <- function(ents, bucket.name){
+ents_to_s3 <- function(ents, bucket.name, multi.part=FALSE){
 	for (fname in ents) {
 		message("Pushing ", fname, " to ", bucket.name, " s3 bucket...")
 		out <- aws.s3::put_object(fname, fname, bucket.name,
-					  acl='public-read', verbose=FALSE,
-		show_progress=TRUE)
+					  acl='public-read', multipart=multi.part,
+					  verbose=FALSE, show_progress=TRUE)
 		message(out) # Should print TRUE if successful
 	}
   message('Done.\n')
