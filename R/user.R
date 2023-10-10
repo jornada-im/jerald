@@ -242,7 +242,8 @@ publish_dataset_edi <- function(datasetid,
     pubflag <- 'update'
     #stop("This package already exists at EDI ", edi.env, ". Use the
     #     `update_dataset_edi` function")
-  }
+  }else{
+    pubflag <- 'create'
   # Warn if the revisions on metabase and EDI don't match
   if (rev.mb != (rev.next-1)){
     warning("The metabase revision (", rev.mb, "), does not match the EDI ",
@@ -269,7 +270,7 @@ publish_dataset_edi <- function(datasetid,
     # Collect the data entities from the eml list & push to s3 bucket
     ents <- get_eml_entities(eml.list.new)
     ents_to_s3(ents, bucket.name, multi.part=multi.part)
-  } else{
+  } else {
     message('Skipping S3 upload: make sure data entity files are online ')
     message('at the URL designated in <distribution>.')
   }
