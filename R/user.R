@@ -273,7 +273,7 @@ publish_dataset_edi <- function(datasetid,
     ents_to_s3(ents, bucket.name, multi.part=multi.part)
   } else {
     message('Skipping S3 upload: make sure data entity files are online ')
-    message('at the URL designated in <distribution>.')
+    message('at the URL designated in <distribution>. \n')
   }
   # Create or update dataset
   if (pubflag=='update'){
@@ -345,7 +345,8 @@ template_dataset_dir <- function(datasetid, get.edi=FALSE){
     message('Creating template: ', t)
     x <- readLines(t)
     y <- gsub("ds999", paste0('ds', as.character(datasetid)), x, fixed=TRUE)
-    y2 <- gsub("dataset.999", paste0('dataset.', as.character(datasetid)), y, fixed=TRUE)    
+    y2 <- gsub("dataset.999", paste0('dataset.', as.character(datasetid)),
+	       y, fixed=TRUE)    
     cat(y2, file=t, sep="\n")
   }
   message('Done.\n')
