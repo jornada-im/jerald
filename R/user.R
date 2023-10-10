@@ -242,8 +242,9 @@ publish_dataset_edi <- function(datasetid,
     pubflag <- 'update'
     #stop("This package already exists at EDI ", edi.env, ". Use the
     #     `update_dataset_edi` function")
-  }else{
+  } else {
     pubflag <- 'create'
+  }
   # Warn if the revisions on metabase and EDI don't match
   if (rev.mb != (rev.next-1)){
     warning("The metabase revision (", rev.mb, "), does not match the EDI ",
@@ -489,5 +490,4 @@ migrate_eal_dir <- function(eal.dir, jerald.dir){
     unlink(eal.dir, recursive = TRUE)
     message('Done.')
   }
-  
 }
