@@ -60,15 +60,18 @@ update_dataset_edi <- function(datasetid,
                                edi.env='staging',
                                publish=FALSE,
                                bucket.name=Sys.getenv('AWS_S3_BUCKETNAME')){
+  warning(paste('This function (update_dataset_edi) is now deprecated and will', 
+                'be removed from a future version of jerald. Use',
+                'publish_dataset_edi instead'), immediate=T)
   
   # Collect metadata into EML list from Metabase (using MetaEgress)
-  eml.list <- eml_from_mb(datasetid, mb.name, mb.cred)
+  eml.list <- eml_egress(datasetid, mb.name, mb.cred)
   # Revision number in metabase
   rev.mb <- unlist(strsplit(eml.list$packageId, ".", fixed=TRUE))[3]
   rev.mb <- as.numeric(rev.mb)
   
   # Update the revision numbers using EDI
-  eml.list.new <- update_eml_revnum_edi(eml.list, edi.env=edi.env)
+  eml.list.new <- increment_edi_revision(eml.list, edi.env=edi.env)
   rev.next <- unlist(strsplit(eml.list.new$packageId, ".", fixed=TRUE))[3]
   rev.next <- as.numeric(rev.next)
   if (rev.next==1){
@@ -76,10 +79,10 @@ update_dataset_edi <- function(datasetid,
          `create_dataset_edi` function")
   }
   # Warn if the revisions on metabase and EDI don't match
-  if (rev.mb!=(rev.next-1)){
-    warning("The metabase revision (", rev.mb, "), does not match the EDI ",
-            edi.env, "revision (", rev.next-1, ").")
-  }
+  #if (rev.mb!=(rev.next-1)){
+  #  warning("The metabase revision (", rev.mb, "), does not match the EDI ",
+  #          edi.env, "revision (", rev.next-1, ").")
+  #}
   
   # Validate and serialize (write) EML document
   message('Validating EML...')
@@ -141,15 +144,18 @@ create_dataset_edi <- function(datasetid,
                                edi.env='staging',
                                publish=FALSE,
                                bucket.name=Sys.getenv('AWS_S3_BUCKETNAME')){
+  warning(paste('This function (create_dataset_edi) is now deprecated and will', 
+          'be removed from a future version of jerald. Use',
+          'publish_dataset_edi instead'), immediate=T)
   
   # Collect metadata into EML list from Metabase (using MetaEgress)
-  eml.list <- eml_from_mb(datasetid, mb.name, mb.cred)
+  eml.list <- eml_egress(datasetid, mb.name, mb.cred)
   # Revision number in metabase
   rev.mb <- unlist(strsplit(eml.list$packageId, ".", fixed=TRUE))[3]
   rev.mb <- as.numeric(rev.mb)
   
   # Update the revision numbers using EDI
-  eml.list.new <- update_eml_revnum_edi(eml.list, edi.env=edi.env)
+  eml.list.new <- increment_edi_revision(eml.list, edi.env=edi.env)
   rev.next <- unlist(strsplit(eml.list.new$packageId, ".", fixed=TRUE))[3]
   rev.next <- as.numeric(rev.next)
   if (rev.next>1){
@@ -157,10 +163,10 @@ create_dataset_edi <- function(datasetid,
          `update_dataset_edi` function")
   }
   # Warn if the revisions on metabase and EDI don't match
-  if (rev.mb != (rev.next-1)){
-    warning("The metabase revision (", rev.mb, "), does not match the EDI ",
-            edi.env, "revision (", rev.next-1, ").")
-  }
+  #if (rev.mb != (rev.next-1)){
+  #  warning("The metabase revision (", rev.mb, "), does not match the EDI ",
+  #          edi.env, "revision (", rev.next-1, ").")
+  #}
   
   # Validate and serialize (write) EML document
   message('Validating EML...')
@@ -211,10 +217,10 @@ create_dataset_edi <- function(datasetid,
 #' @param edi.cred list of credentials to use for EDI
 #' @param edi.env name of the EDI environment to update (staging, production,
 #' or development)
-#' @param dry.run boolean value - end before s3 upload if TRUE (default), 
-#' publish if FALSE
-#' @param skip.s3.upload boolean value - if TRUE skip uploading to the s3
-#' bucket (entities already there). Note that this does not current do a 
+#' @param dry.run boolean value - write EML only, then stop (end before s3 
+#' and EDI upload) if TRUE, continue to publish if FALSE
+#' @param s3.upload boolean value - if TRUE upload to the s3 bucket, if FALSE
+#' skip this (entities already there). Note that this does not currently do a 
 #' check on whether entities are present or not. 
 #' @param bucket.name name of the s3 bucket to push data entities to
 #' @export
@@ -229,36 +235,20 @@ publish_dataset_edi <- function(datasetid,
                                bucket.name=Sys.getenv('AWS_S3_BUCKETNAME')){
   
   # Collect metadata into EML list from Metabase (using MetaEgress)
-  eml.list <- eml_from_mb(datasetid, mb.name, mb.cred)
-  # Revision number in metabase
-  rev.mb <- unlist(strsplit(eml.list$packageId, ".", fixed=TRUE))[3]
-  rev.mb <- as.numeric(rev.mb)
+  eml.list <- eml_egress(datasetid, mb.name, mb.cred)
   
   # Update the revision numbers using EDI
-  eml.list.new <- update_eml_revnum_edi(eml.list, edi.env=edi.env)
-  rev.next <- unlist(strsplit(eml.list.new$packageId, ".", fixed=TRUE))[3]
-  rev.next <- as.numeric(rev.next)
+  eml.list.new <- increment_edi_revision(eml.list, edi.env=edi.env)
+  rev.next <- parse_edi_pid(eml.list.new, 'revision')
   if (rev.next>1){
     pubflag <- 'update'
-    #stop("This package already exists at EDI ", edi.env, ". Use the
-    #     `update_dataset_edi` function")
   } else {
     pubflag <- 'create'
   }
-  # Warn if the revisions on metabase and EDI don't match
-  if (rev.mb != (rev.next-1)){
-    warning("The metabase revision (", rev.mb, "), does not match the EDI ",
-            edi.env, " revision (", rev.next-1, ").")
-  }
   
   # Validate and serialize (write) EML document
-  message('Validating EML...')
-  out <- EML::eml_validate(eml.list.new)
-  message(out)
-  message('Writing EML...')
   emlfile <- paste0(eml.list.new$packageId, ".xml")
-  EML::write_eml(eml.list.new, file=emlfile)
-  message('Done.\n')
+  eml_serialize(eml.list.new, emlfile)
   
   if (dry.run){
     message('Stopping because this is a dry run')
