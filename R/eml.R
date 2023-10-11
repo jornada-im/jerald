@@ -78,15 +78,15 @@ get_eml_entities <- function(eml.list){
   return(entlist)
 }
 
-#' Insert markdown methodstep element in an EML document
+#' Insert markdown methodstep element into an EML document
 #'
-#' This function extracts the data entity filenames (dataTables and 
-#' otherEntities) from an EML-schema-formatted list and returns a vector
-#' of the filenames (useful for upload to s3 buckets).
+#' This function inserts a markdown methods section into a methodstep for an
+#' EML document. Supply a markdown file and it will be inserted into the first
+#' methodstep.
 #' 
 #' @param eml.list An EML-schema-formatted R list (EML R package compliant)
 #' @param md_file A markdown methods file (full path)
-#' @return An EML-schema-formatted R list (EML R package compliant)
+#' @return An updated EML-schema-formatted R list (EML R package compliant)
 #' @export
 insert_methodstep_md <- function(eml.list, md_file, islist=TRUE){
   methodmd <- readChar(md_file, file.info(md_file)$size)
@@ -96,7 +96,32 @@ insert_methodstep_md <- function(eml.list, md_file, islist=TRUE){
   } else {
     eml.list$dataset$methods$methodStep$description <- list(markdown=methodmd)
   }
-  # Validate and write out (and hand-edit if necessary)
-  EML::eml_validate(eml.list)
+  # Validate and return
+  out <- EML::eml_validate(eml.list)
+  message(out)
+  return(eml.list)
+}
+
+#' Insert dataSource XML elements into an EML document
+#'
+#' This function inserts <dataSource> elements into a methodstep for an
+#' EML document. Supply an XML file with a list of data sources and it
+#' will be inserted into the first methodstep.
+#' 
+#' @param eml.list An EML-schema-formatted R list (EML R package compliant)
+#' @param xml_file XML file with one or more <dataSource> elements (full path)
+#' @return An updated EML-schema-formatted R list (EML R package compliant)
+#' @export
+insert_datasource_xml <- function(eml.list, xml_file, islist=TRUE){
+  dsources <- EML::read_eml(xml_file)
+  # Add the list of data source elements (becomes <dataSource> list element)
+  if (islist){
+    eml.list$dataset$methods$methodStep[[1]]$dataSource <- dsources$dataSource
+  } else {
+    eml.list$dataset$methods$methodStep$dataSource <- dsources$dataSource
+  }
+  # Validate and return
+  out <- EML::eml_validate(eml.list)
+  message(out)
   return(eml.list)
 }

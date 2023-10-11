@@ -2,7 +2,7 @@
 % Please edit documentation in R/eml.R
 \name{insert_methodstep_md}
 \alias{insert_methodstep_md}
-\title{Insert markdown methodstep element in an EML document}
+\title{Insert markdown methodstep element into an EML document}
 \usage{
 insert_methodstep_md(eml.list, md_file, islist = TRUE)
 }
@@ -12,10 +12,10 @@ insert_methodstep_md(eml.list, md_file, islist = TRUE)
 \item{md_file}{A markdown methods file (full path)}
 }
 \value{
-An EML-schema-formatted R list (EML R package compliant)
+An updated EML-schema-formatted R list (EML R package compliant)
 }
 \description{
-This function extracts the data entity filenames (dataTables and
-otherEntities) from an EML-schema-formatted list and returns a vector
-of the filenames (useful for upload to s3 buckets).
+This function inserts a markdown methods section into a methodstep for an
+EML document. Supply a markdown file and it will be inserted into the first
+methodstep.
 }
