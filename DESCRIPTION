@@ -16,4 +16,5 @@ RoxygenNote: 7.2.3
 Imports: 
     aws.s3,
     EDIutils,
+    magrittr,
     MetaEgress
