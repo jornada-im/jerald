@@ -1,5 +1,4 @@
-library('tidyverse')
-
+#library('tidyverse')
 
 #' Create the DataSet table from an EML list (emld object)
 #'
