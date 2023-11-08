@@ -14,7 +14,7 @@
 format_DataSet <- function(dsid, eml,
                            revnum=0,
                            outpath=getwd(),
-                           boilerplate_id='jrn_default') {
+                           boilerplate_id='jrn-default') {
   # Write out the Abstract
   lines <- character(length(eml$dataset$abstract))
   for (i in 1:length(lines)) {

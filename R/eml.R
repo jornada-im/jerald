@@ -6,9 +6,14 @@
 #' @param datasetid Number or numeric vector of dataset IDs to query
 #' @param mb.name Name of the LTER metabase to query metadata from
 #' @param mb.cred Credentials for mb.name (a list, see `load_metabase_cred`)
+#' @param skip_checks Boolean value (T/F) indicating whether or not to check
+#' for congruence between data entity and attribute metadata 
+#' (check_attribute_congruence function). May want to set as True if the data
+#' are online and not in the working directory.
 #' @return An EML-schema-formatted list of metadata (EML R package compliant)
 #' @export
-eml_egress <- function(datasetid, mb.name, mb.cred){
+eml_egress <- function(datasetid, mb.name, mb.cred,
+                       skip_checks=FALSE){
   # Get metadata from metabase
   message('MetaEgress is collecting metadata for ', datasetid, ' from LTER ',
           'Metabase ', mb.name, '...')
@@ -20,7 +25,8 @@ eml_egress <- function(datasetid, mb.name, mb.cred){
   message('Generating entity table...')
   entities <- MetaEgress::create_entity_all(meta_list =  metadata,
                                             file_dir = getwd(),
-                                            dataset_id = datasetid)
+                                            dataset_id = datasetid,
+                                            skip_checks = skip_checks)
   # Create an EML schema list object
   message('Creating EML schema list...')
   eml.list <- MetaEgress::create_EML(meta_list = metadata,

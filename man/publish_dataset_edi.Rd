@@ -13,6 +13,7 @@ publish_dataset_edi(
   dry.run = TRUE,
   s3.upload = TRUE,
   multi.part = FALSE,
+  skip_checks = FALSE,
   bucket.name = Sys.getenv("AWS_S3_BUCKETNAME")
 )
 }
@@ -32,9 +33,14 @@ or development)}
 \item{dry.run}{boolean value - write EML only, then stop (end before s3
 and EDI upload) if TRUE, continue to publish if FALSE}
 
-\item{s3.upload}{boolean value - if TRUE upload to the s3 bucket, if FALSE
-skip this (entities already there). Note that this does not currently do a
-check on whether entities are present or not.}
+\item{s3.upload}{boolean value (T/F) if TRUE upload to the s3 bucket, if
+FALSE skip this (entities already there). Note that this does not currently
+do a check on whether entities are present or not.}
+
+\item{skip_checks}{boolean value (T/F) indicating whether or not to check
+for congruence between data entity and attribute metadata
+(check_attribute_congruence function). May want to set as True if the data
+are online and not in the working directory.}
 
 \item{bucket.name}{name of the s3 bucket to push data entities to}
 }

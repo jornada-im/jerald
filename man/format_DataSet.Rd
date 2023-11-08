@@ -9,7 +9,7 @@ format_DataSet(
   eml,
   revnum = 0,
   outpath = getwd(),
-  boilerplate_id = "jrn_default"
+  boilerplate_id = "jrn-default"
 )
 }
 \arguments{
