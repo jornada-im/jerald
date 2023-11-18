@@ -89,39 +89,45 @@ format_DataSetMethod <- function(dsid, eml, outpath=getwd()){
 #' @export
 format_DataSetEntities <- function(dsid, eml){
 
+  # First concatenate lists of all dataTable and otherEntity elements
+  data_tables <- return_list_if_single(eml$dataset$dataTable)
+  other_ents <- return_list_if_single(eml$dataset$otherEntity)
+
+  entities <- do.call('c', list(data_tables, other_ents))
+
   # Preallocate lists for entities
-  entsortorder <- numeric(length(eml$dataset$dataTable))
-  entnames <- character(length(eml$dataset$dataTable))
-  entdescs <- character(length(eml$dataset$dataTable))
-  entrecords <- rep(NA, length(eml$dataset$dataTable))
-  filetypes <- character(length(eml$dataset$dataTable))
-  urlheads <- character(length(eml$dataset$dataTable))
-  subpaths <- rep(NA, length(eml$dataset$dataTable))
-  filenames <- character(length(eml$dataset$dataTable))
-  addinfo <- rep(NA, length(eml$dataset$dataTable))
-  filesizes <-rep(NA, length(eml$dataset$dataTable))
-  filesizeunits <- rep(NA, length(eml$dataset$dataTable))
-  checksums <- character(length(eml$dataset$dataTable))
+  entsortorder <- numeric(length(entities))
+  entnames <- character(length(entities))
+  entdescs <- character(length(entities))
+  entrecords <- rep(NA, length(entities))
+  filetypes <- character(length(entities))
+  urlheads <- character(length(entities))
+  subpaths <- rep(NA, length(entities))
+  filenames <- character(length(entities))
+  addinfo <- rep(NA, length(entities))
+  filesizes <-rep(NA, length(entities))
+  filesizeunits <- character(length(entities))
+  checksums <- character(length(entities))
 
   # Loop and populate vectors
-  for (i in 1:length(eml$dataset$dataTable)) {
+  for (i in 1:length(entities)) {
     entsortorder[i] <- i
-    entnames[i] <- eml$dataset$dataTable[[i]]$entityName
-    entdescs[i] <- eml$dataset$dataTable[[i]]$entityDescription
-    entrecords[i] <- eml$dataset$dataTable[[i]]$numberOfRecords
+    entnames[i] <- entities[[i]]$entityName
+    entdescs[i] <- entities[[i]]$entityDescription
+    entrecords[i] <- return_if_node_exists(entities[[i]]$numberOfRecords)
     #filetypes[i] <- eml$... some kind of check
     # The ifelse is for some minor attribute inconsistency in ezEML XML files
-    if (length(eml$dataset$dataTable[[i]]$physical$distribution$online$url) > 1){
-      filenames[i] <- tail(unlist(strsplit(eml$dataset$dataTable[[i]]$physical$distribution$online$url$url, '/')), n=1)
-      urlheads[i] <- unlist(strsplit(eml$dataset$dataTable[[i]]$physical$distribution$online$url$url, filenames[i]))
+    if (length(entities[[i]]$physical$distribution$online$url) > 1){
+      filenames[i] <- tail(unlist(strsplit(entities[[i]]$physical$distribution$online$url$url, '/')), n=1)
+      urlheads[i] <- unlist(strsplit(entities[[i]]$physical$distribution$online$url$url, filenames[i]))
     } else {
-      filenames[i] <- tail(unlist(strsplit(eml$dataset$dataTable[[i]]$physical$distribution$online$url, '/')), n=1)
-      urlheads[i] <- unlist(strsplit(eml$dataset$dataTable[[i]]$physical$distribution$online$url, filenames[i]))
+      filenames[i] <- tail(unlist(strsplit(entities[[i]]$physical$distribution$online$url, '/')), n=1)
+      urlheads[i] <- unlist(strsplit(entities[[i]]$physical$distribution$online$url, filenames[i]))
     }
-    #additionalinf[i] = eml$dataset$dataTable[[i]]$physical$additionalInfo
-    filesizes[i] <- eml$dataset$dataTable[[i]]$physical$size$size
-    filesizeunits[i] <- eml$dataset$dataTable[[i]]$physical$size$unit
-    checksums[i] <- eml$dataset$dataTable[[i]]$physical$authentication$authentication
+    addinfo[i] = return_if_node_exists(entities[[i]]$physical$additionalInfo)
+    filesizes[i] <- entities[[i]]$physical$size$size
+    filesizeunits[i] <- entities[[i]]$physical$size$unit
+    checksums[i] <- return_if_node_exists(entities[[i]]$physical$authentication$authentication)
   }
   # Make dataframe
   mbtable <- data.frame('DataSetID'=dsid,
