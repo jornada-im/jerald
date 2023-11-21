@@ -342,8 +342,12 @@ template_dataset_dir <- function(datasetid, get.edi=FALSE){
     x <- readLines(t)
     y <- gsub("ds999", paste0('ds', as.character(datasetid)), x, fixed=TRUE)
     y2 <- gsub("dataset.999", paste0('dataset.', as.character(datasetid)),
-	       y, fixed=TRUE)    
-    cat(y2, file=t, sep="\n")
+	       y, fixed=TRUE)
+    y3 <- gsub("eml.999", paste0('eml.', as.character(datasetid)),
+	       y2, fixed=TRUE)
+    y4 <- gsub("id <- 999", paste0('id <- ', as.character(datasetid)),
+	       y3, fixed=TRUE)
+    cat(y4, file=t, sep="\n")
   }
   message('Done.\n')
 }

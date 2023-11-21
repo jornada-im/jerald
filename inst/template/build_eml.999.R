@@ -46,11 +46,9 @@ load_metabase_cred(mbcred_path)
 load_destination_cred(destcred_path)
 
 # Now create or update the dataset on EDI...
-# Note that you must pass `publish=TRUE` to actually
-# publish the data. Only do that when you have checked
-# dataset identifiers, revision numbers, eml, etc.
-# create_dataset_edi(id, mbname, mbcred, edicred, edi.env=env)
-update_dataset_edi(id, mbname, mbcred, edicred, edi.env=env)
+# You must pass `dry.run=FALSE` to really publish the data. Make sure to check
+# dataset identifiers, revision numbers, eml, and other details first.
+publish_dataset_edi(id, mbname, mbcred, edicred, edi.env=env)
 
 # Clean up
 remove(mbcred, edicred, mbname, mbcred_path, destcred_path)

@@ -55,17 +55,20 @@ There are several user functions for publishing data to EDI. The first step is t
 
 where `mb.pathname` is the path to a Metabase credentials file and `dest.path` is the directory path containing a `jerald_destination_keys.R` file. Again, your lead IM or system administrator can provide templates for the Metabase credentials file, and will likely set up the destination credentials file for you.
 
-Once the credentials have been loaded you can create and upload datasets at EDI (or possibly other repositories in the future...). To update an existing dataset on EDI use:
+Once the credentials have been loaded you can create and upload datasets at EDI (or possibly other repositories in the future...). To publish a dataset to EDI use:
 
-    update_dataset_edi(datasetid, mb.name, mb.cred, edi.cred)
+    publish_dataset_edi(datasetid, mb.name, mb.cred, edi.cred)
 
-where `datasetid` is the unique identifier for the dataset in your Metabase and EDI; `mb.name` is the name of your Metabase and is returned by `load_metabase_cred`; `mb.cred` is a list of credentials for Metabase and is returned by `load_metabase_cred`; `edi.cred` is a list of credentials for EDI and is returned by `load_destination_cred`. For safety, the default arguments for this function will either do a "dry-run" of the process (no update to EDI), or will update the data package at the EDI "staging" repository. You can change both behaviors using the `edi.env` and `publish` arguments once you are sure you are ready to publish. Note that a dataset is called a data package in EDI terms.
+where `datasetid` is the unique identifier for the dataset in your Metabase and EDI; `mb.name` is the name of your Metabase and is returned by `load_metabase_cred`; `mb.cred` is a list of credentials for Metabase and is returned by `load_metabase_cred`; `edi.cred` is a list of credentials for EDI and is returned by `load_destination_cred`. For safety, the default arguments for this function will either do a "dry-run" of the process (no update to EDI), or will update the data package at the EDI "staging" repository. You can change both behaviors using the `edi.env` and `dry.run` arguments once you are sure you are ready to publish. 
 
-To create a new dataset on EDI use:
+Make sure to check revision numbers, dataset id, and other details before setting `dry.run=FALSE`. If the dataset is new to EDI repository it should be created with revision number 1, and if it is an update the dataset will be published with a revision number incremented by 1 from what is already present at EDI. Note that a dataset is called a data package in EDI terms.
 
-    create_dataset_edi(datasetid, mb.name, mb.cred, edi.cred)
+#### Useful options for `publish_dataset_edi()`
 
-where the arguments are the same as above. Note that this will be revision "1" of the data package, so make sure your EML reflects this before publishing.
+* `dry.run` controls whether publication completes or is a dry run (as explained above). `TRUE` by default.
+* `s3.upload` controls whether the data entities will be pushed to the s3 bucket (`TRUE` by default). If the entities already exist at the URL specified in the EML this may be set to `FALSE`. Note that file identities (md5 hashes) are not checked.
+* `multi.part` controls whether data entities are pushed to the s3 bucket with a multi-part upload (`FALSE` by default. This is useful for large files, and required beyond a certain filesize threshold.
+* `skip_checks` controls whether congruence between attribute metadata and data files is checked (`FALSE` by default). When the data are not locally present, for example when they are hosted at ezEML, this can be set to `TRUE` to avoid a missing file error. Make sure congruence has been checked in the remote location first.
 
 ## Other functions
 
