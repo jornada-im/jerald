@@ -16,10 +16,10 @@ format_DataSet <- function(dsid, eml,
                            outpath=getwd(),
                            boilerplate_id='jrn-default') {
   # Write out the Abstract
-  lines <- character(length(eml$dataset$abstract))
+  lines <- character(length(eml$dataset$abstract$para))
   for (i in 1:length(lines)) {
-    print(eml$dataset$abstract[[i]])
-    lines[[i]] <- eml$dataset$abstract[[i]]
+    print(eml$dataset$abstract$para[[i]])
+    lines[[i]] <- eml$dataset$abstract$para[[i]]
   }
   outfile = paste0('abstract.', dsid, '.ingress.md')
   fileConn<-file(paste0(outpath, outfile))
@@ -55,17 +55,62 @@ format_DataSet <- function(dsid, eml,
 #' lter_metabase.'DataSetMethod' table
 #' @export
 format_DataSetMethod <- function(dsid, eml, outpath=getwd()){
-  # Write out the methods (loop through MethodSteps if present)
-  lines <- character(length(eml$dataset$methods$methodStep))
-  for (i in 1:length(eml$dataset$methods$methodStep)) {
-    print(eml$dataset$methods$methodStep[[i]]$description[[1]])
-    lines[[i]] <- eml$dataset$methods$methodStep[[i]]$description[[1]]
+  # Write out the methods 
+  # If just one Methodstep
+  if ('description' %in% names(eml$dataset$methods$methodStep)){
+    lines <- eml$dataset$methods$methodStep$description$para
+  } else {
+  # loop through MethodSteps if present)
+    lines <- character(length(eml$dataset$methods$methodStep))
+    for (i in 1:length(lines)) {
+      print(eml$dataset$methods$methodStep[[i]]$description$para)
+      lines[[i]] <- eml$dataset$methods$methodStep[[i]]$description$para
+    }
   }
   outfile = paste0('methods.', dsid, '.ingress.md')
   fileConn<-file(paste0(outpath, outfile))
   writeLines(lines, fileConn)
   close(fileConn)
   # Now make a DataSetMethod table referring to the file (assuming 1 Methods)
+  mbtable <- data.frame(
+    'DataSetID' = dsid,
+    'MethodStepID' = 1,
+    'DescriptionType' = 'file',
+    'Description' = outfile,
+    'Method_xml' = NA
+  )
+  # Return a named list
+  return(list('DataSetMethod' = mbtable))
+}
+
+
+#' Create the DataSetMethodProvenance table from an EML list (emld object)
+#' 
+#' INCOMPLETE!
+#'
+#' @param dsid The dataset id value, which is the primary key for lter_metabase
+#' @param eml An emld object derived from an EML file
+#' @param outpath The path to output a methods markdown file to. Defaults to
+#' current working directory
+#' @return A named list containing a dataframe formatted to match the 
+#' lter_metabase.'DataSetMethod' table
+#' @export
+format_DataSetMethodProvenance <- function(dsid, eml, outpath=getwd()){
+  # Get the data sources
+  # If just one Methodstep
+  if ('dataSource' %in% names(eml$dataset$methods$methodStep)){
+    dsource_url <- eml$dataset$methods$methodStep$dataSource$distribution$online$url
+    dsource <- paste(tail(strsplit(dsource_url, '/')[[1]], 3), collapse='.')
+  } else {
+  # loop through MethodSteps if present)
+    dsources <- character(length(eml$dataset$methods$methodStep))
+    for (i in 1:length(lines)) {
+      print(eml$dataset$methods$methodStep[[i]]$description$para)
+      dsource_url <- eml$dataset$methods$methodStep[[i]]$dataSource$distribution$online$url
+      dsources[[i]] <- paste(tail(strsplit(dsource_url, '/')[[1]], 3), collapse='.')
+    }
+  }
+  # Now make a DataSetMethodProvenance table referring to the file (assuming 1 Methods)
   mbtable <- data.frame(
     'DataSetID' = dsid,
     'MethodStepID' = 1,
