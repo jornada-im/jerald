@@ -19,5 +19,9 @@ A named list containing a dataframe formatted to match the
 lter_metabase.'DataSetMethod' table
 }
 \description{
-Create the DataSetMethod table from an EML list (emld object)
+Methods elements vary widely and may have complex nesting structures. In
+addition, not all methods children are well-represented in metabase. This
+extracts all child elements of any \if{html}{\out{<methods>}} nested at dataset or other
+levels in eml, and prints to a file. The file needs editing afterwards, but
+this is probably a more effient approach for now.
 }

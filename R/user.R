@@ -12,6 +12,29 @@ load_metabase_cred <- function(pathname){
   source(pathname)
 }
 
+#' Connect to an LTER Metabase
+#'
+#' @param mbcred_path Path to a file containing credentials for an LTER Metabase instance
+#' @return A connection to the LTER Metabase
+#' @export
+metabase_connect <- function(mbcred_path) {
+    # Get metabase credentials (includes host, port, user, pwd, and dbname)
+    load_metabase_cred(mbcred_path)
+
+    # Get postgres driver and connect to the metabase
+    driver <- RPostgres::Postgres()
+    
+    conn <- RPostgres::dbConnect(
+        drv = driver,
+        dbname = mbname,
+        host = mbcred$host,
+        port = mbcred$port,
+        user = mbcred$user,
+        password = mbcred$password)
+        
+    return(conn)
+}
+
 #' Get dataset destination credentials
 #'
 #' This function reads credentials for any data repositories and s3 buckets
@@ -290,13 +313,12 @@ publish_dataset_edi <- function(datasetid,
 #' update in EDI
 #' @export
 #' 
-template_dataset_dir <- function(datasetid, get.edi=FALSE){
+template_dataset_dir <- function(datasetid){
   
   datasetid <- format(datasetid, scientific = FALSE)
   
   # Create dataset directory name
-  user.shortname <- readline(paste0('Enter a short name to append to the ',
-                             'dataset directory: '))
+  user.shortname <- readline(paste0('Enter a short name for the dataset: '))
   dir.name <- paste(datasetid, user.shortname, sep='_')
   
   # Choose parent directory
@@ -350,7 +372,20 @@ template_dataset_dir <- function(datasetid, get.edi=FALSE){
     cat(y4, file=t, sep="\n")
   }
   message('Done.\n')
+
+  # Ask if user wants to template a metabase dataset
+  user.template_metabase <- readline(paste0('Do you want to create an entry in metabase? (Y/n): '))
+  # If so, run template_metabase
+  if (tolower(user.template_metabase)=='y'){
+    template_dataset_metabase(datasetid, user.shortname)
+  }
 }
+
+template_dataset_metabase <- function(datasetid, shortname){
+  message("You have selected to create an entry in Metabase for ", datasetid, ".")
+  message(" but this feature is not implemented yet!")
+}
+
 
 #' Migrate an EAL dataset directory to a jerald directory
 #'

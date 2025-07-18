@@ -1,5 +1,7 @@
 #library('tidyverse')
 
+#' Create a list of template tables for metabase
+
 #' Create the DataSet table from an EML list (emld object)
 #'
 #' @param dsid The dataset id value, which is the primary key for lter_metabase
@@ -45,6 +47,49 @@ format_DataSet <- function(dsid, eml,
   return(list('DataSet' = mbtable))
 }
 
+# WIP!!!!
+format_DataSet2 <- function(mb, eml,
+                           revnum=0,
+                           outpath=getwd(),
+                           boilerplate_id='jrn-default') {
+  # Get the metabase datasetID and compare to eml
+  dsid <- mb$DataSetID
+  if (dsid != strsplit(eml$packageId, '\\.')[[1]][[2]]){
+    message("Warning: the metabase and eml dataset IDs don't match!")
+  }
+
+
+  # Write out the Abstract
+  lines <- character(length(eml$dataset$abstract$para))
+  for (i in 1:length(lines)) {
+    print(eml$dataset$abstract$para[[i]])
+    lines[[i]] <- eml$dataset$abstract$para[[i]]
+  }
+  outfile = paste0('abstract.', dsid, '.ingress.md')
+  fileConn<-file(paste0(outpath, '/', outfile))
+  message(paste0('Writing ', paste0(outpath, '/', outfile)))
+  writeLines(lines, fileConn)
+  close(fileConn)
+
+  # Now populate the DataSet table (one row for a new dataset)
+  # Setting some defaults here... could revise
+  mbtable <- data.frame(list(dsid, revnum,
+    eml$dataset$title,
+    return_if_node_exists(eml$dataset$pubDate),
+    outfile, #unlist(eml$dataset$abstract),
+    return_if_node_exists(eml$dataset$shortName),
+    return_if_node_exists(eml$dataset$maintenance$maintenanceUpdateFrequency),
+    return_if_node_exists(eml$dataset$maintenance$description),
+    'file',
+    boilerplate_id
+  )
+  )
+  
+  stopifnot(identical(names(mb$DataSetID), names(mbtable)))
+
+  # Return a named list
+  return(list('DataSet' = mbtable))
+}
 
 #' Create the DataSetMethod table from an EML list (emld object)
 #' 
@@ -326,6 +371,146 @@ format_DataSetAttributes <- function(dsid, eml){
   return(list('DataSetAttributes'=atts,
               'ListCodes'=listcodes,
               'DataSetAttributeEnumeration'=attenums,
+              'DataSetAttributeMissingCodes'=missvals)
+        )
+}
+
+#' Create the DataSetAttributes and related tables from a dataframe 
+#'
+#' @param dsid The dataset id value, which is the primary key for lter_metabase
+#' @param df A dataframe object or list of dataframes
+#' @return A named list containing four dataframes formatted to match the 
+#' lter_metabase.'DataSetAttributes', lter_metabase.'ListCodes',
+#' lter_metabase.'DataSetAttributeEnumeration', and
+#' lter_metabase.'DataSetAttributeMissingCodes' tables.
+#' @export
+format_DataSetAttributes_df <- function(dsid, df){
+
+  # First concatenate lists of all dataTable and otherEntity elements
+  data_tables <- if (is.data.frame(df)) list(df) else df
+
+  # Preallocate lists to hold tables
+  att_tbls <- vector("list", length = length(data_tables))
+  attenum_tbls <- vector("list", length = length(data_tables))
+  missval_tbls <- vector("list", length = length(data_tables))
+  listcode_tbls <- vector("list", length = length(data_tables))
+
+  # Loop and populate attribute tables
+  for (i in 1:length(data_tables)) {
+    # Initialize the attribute table
+    # First get classes out so we can remove parentclass difftime
+    classes <- unlist(unname(sapply(df, class)))
+    att_i_init <- data.frame(
+      attributeName = names(df),
+      storageType = classes[! classes %in% c('difftime')],
+      numMissing = unlist(unname(sapply(df, function(x) sum(is.na(x)))))
+      )
+
+    # 1. Format the attributes table to match metabase (DataSetAttributes)
+    att_i <- att_i_init %>% 
+      dplyr::mutate(DataSetID = dsid,
+                    EntitySortOrder = i,
+                    ColumnPosition = rownames(.),
+                    AttributeID = attributeName,
+                    AttributeLabel = "Unlabeled",
+                    Description = "No description",
+                    StorageType = dplyr::case_when(
+                        storageType == 'factor' ~ 'string',
+                        storageType == 'character' ~ 'string',
+                        storageType == 'integer' ~ 'integer',
+                        storageType == 'numeric' ~ 'float',
+                        storageType == 'Date' ~ 'dateTime',
+                        storageType == 'hms' ~ 'dateTime',
+                        storageType == 'POSIXct' ~ 'dateTime',
+                        storageType == 'POSIXlt' ~ 'dateTime',
+                        storageType == 'logical' ~ 'boolean'
+                        ),
+                    # 
+                    MeasurementScaleDomainID = dplyr::case_when(
+                        storageType == 'factor' ~ 'nominalEnum',
+                        storageType == 'character' ~ 'nominalText',
+                        storageType == 'integer' ~ 'interval',
+                        storageType == 'numeric' ~ 'ratio',
+                        storageType == 'Date' ~ 'dateTime',
+                        storageType == 'hms' ~ 'dateTime',
+                        storageType == 'POSIXct' ~ 'dateTime',
+                        storageType == 'POSIXlt' ~ 'dateTime',
+                        storageType == 'logical' ~ 'nominalEnum'
+                        ),
+                    DateTimeFormatString = dplyr::case_when(
+                        StorageType == 'dateTime' ~ "YYYY-MM-DD"),
+                    DateTimePrecision = dplyr::case_when(
+                        StorageType == 'dateTime' ~ 1),
+                    TextPatternDefinition = dplyr::case_when(
+                        MeasurementScaleDomainID == 'nominalText' ~ 'any text'),
+                    Unit = dplyr::case_when(
+                        MeasurementScaleDomainID == 'interval' ~ 'number',
+                        MeasurementScaleDomainID == 'ratio' ~ 'dimensionless'),
+                    NumericPrecision = NA,
+                    NumberType = dplyr::case_when(
+                        MeasurementScaleDomainID == 'interval' ~ 'integer',
+                        MeasurementScaleDomainID == 'ratio' ~ 'real'),
+                    BoundsMinimum = NA, 
+                    BoundsMaximum = NA) %>%
+      dplyr::select(DataSetID, EntitySortOrder, ColumnPosition,
+                    ColumnName = attributeName,
+                    AttributeID, AttributeLabel, Description,
+                    StorageType, MeasurementScaleDomainID,
+                    DateTimeFormatString, DateTimePrecision,
+                    TextPatternDefinition, Unit,
+                    NumericPrecision, NumberType,
+                    BoundsMinimum, BoundsMaximum)
+    # Add the metabase formatted table to the list
+    att_tbls[[i]] <- att_i
+
+    # 2. Create a missing values table to match metabase (DataSetAttributeMissingCodes)
+
+    miss_i <- att_i_init %>% 
+      dplyr::filter(numMissing > 0) %>%
+      dplyr::mutate(DataSetID = dsid,
+                    EntitySortOrder = i,
+                    MissingValueCodeID = "NA1") %>%
+      dplyr::select(DataSetID, EntitySortOrder, ColumnName=attributeName,
+                    MissingValueCodeID)
+    missval_tbls[[i]] <- miss_i
+
+    # 3. Format the factors table to match metabase (DataSetAttributeEnumeration)
+    #enum_i <- att_i_init %>% 
+    #  dplyr::mutate(DataSetID = dsid,
+    #                EntitySortOrder = i) %>%
+    #  dplyr::select(DataSetID, EntitySortOrder,ColumnName=attributeName, CodeID=code)
+    # Add the metabase formatted table to the list
+    #attenum_tbls[[i]] <- enum_i
+
+
+    # 4. Format unique codes to match metabase (ListCodes)
+    # First get categorical codes from "factors" table
+    #code1_i <- attList$factors %>% 
+    #  dplyr::mutate(CodeID = paste('emlCode', code, sep='_')) %>%
+    #  dplyr::select(CodeID, Code=code, CodeExplanation=definition)
+
+    # Then missing codes from attributes table
+    #code2_i <- attList$attributes %>% 
+    #  dplyr::filter(!is.na(missingValueCodeExplanation)) %>%
+    #  dplyr::mutate(CodeID = paste('emlMiss', missingValueCode, sep='_'),
+    #                Code = missingValueCode,
+    #                CodeExplanation = missingValueCodeExplanation) %>%
+    #  dplyr::select(CodeID, Code, CodeExplanation)
+
+    # Concatenate categorical and missing codes
+    #code_i <- do.call(rbind, list(code1_i, code2_i))
+    # join to ListCode list
+    #listcode_tbls[[i]] <- code_i
+  }
+
+  # Now join the collected tables
+  atts <- do.call(rbind, att_tbls)
+  #attenums <- do.call(rbind, attenum_tbls)
+  missvals <- do.call(rbind, missval_tbls)
+  #listcodes <- unique(do.call(rbind, listcode_tbls)) # get unique rows
+
+  # Return a named list
+  return(list('DataSetAttributes'=atts,
               'DataSetAttributeMissingCodes'=missvals)
         )
 }
@@ -639,8 +824,8 @@ format_DataSetSites <- function(dsid, eml){
 #' @export
 ingress_table <- function(conn, tablename, df, schema='lter_metabase'){
   # Write to the named table and print output
-  out <- RPostgres::dbWriteTable(con, Id(schema = schema,
-                                         table = tablename),
+  out <- RPostgres::dbWriteTable(conn, DBI::Id(schema = schema,
+                                              table = tablename),
                                  df, row.names=FALSE,
                                  append=TRUE)
   message(out)

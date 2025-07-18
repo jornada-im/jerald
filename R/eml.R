@@ -14,23 +14,24 @@
 #' @export
 eml_egress <- function(datasetid, mb.name, mb.cred,
                        skip_checks=FALSE){
-  # Get metadata from metabase
+  # Get metadata (list of dataframes) from metabase
   message('MetaEgress is collecting metadata for ', datasetid, ' from LTER ',
           'Metabase ', mb.name, '...')
   metadata <- do.call(MetaEgress::get_meta, 
                       c(list(dbname = mb.name,
                              dataset_ids = c(datasetid)),
                         mb.cred)) # assigned in cred file
-  # Create a list of entities formatted for the EML document
+  # Create a nested list of dataTables and otherEntities formatted for the
+  # EML document
   message('Generating entity table...')
-  entities <- MetaEgress::create_entity_all(meta_list =  metadata,
+  entity.list <- MetaEgress::create_entity_all(meta_list =  metadata,
                                             file_dir = getwd(),
                                             dataset_id = datasetid,
                                             skip_checks = skip_checks)
-  # Create an EML schema list object
+  # Create an EML schema list object (nested list)
   message('Creating EML schema list...')
   eml.list <- MetaEgress::create_EML(meta_list = metadata,
-                                     entity_list = entities,
+                                     entity_list = entity.list,
                                      dataset_id = datasetid,
                                      expand_taxa = TRUE,
                                      skip_taxa = FALSE)
@@ -67,21 +68,21 @@ eml_serialize <- function(eml.list, fname){
 #' @export
 get_eml_entities <- function(eml.list){
   # Get dataTable filenames from EML
-  entlist <- c()
+  entityname.list <- c()
   if (length(eml.list$dataset$dataTable) > 0){
     for (i in 1:length(eml.list$dataset$dataTable)){
-      entlist <- append(entlist,
+      entityname.list <- append(entityname.list,
 			eml.list$dataset$dataTable[[i]]$physical$objectName)
     }
   }
   # Also add other entities
   if (length(eml.list$dataset$otherEntity) > 0){
     for (i in 1:length(eml.list$dataset$otherEntity)){
-      entlist <- append(entlist,
+      entityname.list <- append(entityname.list,
 			eml.list$dataset$otherEntity[[i]]$physical$objectName)
     }
   }
-  return(entlist)
+  return(entityname.list)
 }
 
 #' Insert markdown methodstep element into an EML document

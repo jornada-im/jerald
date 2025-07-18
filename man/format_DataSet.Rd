@@ -2,7 +2,8 @@
 % Please edit documentation in R/meta_ingress.R
 \name{format_DataSet}
 \alias{format_DataSet}
-\title{Create the DataSet table from an EML list (emld object)}
+\title{Create a list of template tables for metabase
+Create the DataSet table from an EML list (emld object)}
 \usage{
 format_DataSet(
   dsid,
@@ -28,5 +29,6 @@ A named list containing a dataframe formatted to match the
 lter_metabase.'DataSet' table
 }
 \description{
+Create a list of template tables for metabase
 Create the DataSet table from an EML list (emld object)
 }

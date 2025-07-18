@@ -4,7 +4,7 @@
 \alias{template_dataset_dir}
 \title{Create a dataset directory from a jerald template}
 \usage{
-template_dataset_dir(datasetid, get.edi = FALSE)
+template_dataset_dir(datasetid)
 }
 \arguments{
 \item{datasetid}{ID number of the dataset to find in metabase and
