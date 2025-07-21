@@ -13,9 +13,9 @@ format_DataSetAttributes(dsid, eml)
 }
 \value{
 A named list containing four dataframes formatted to match the
-lter_metabase.'DataSetAttributes', lter_metabase.'ListCodes',
-lter_metabase.'DataSetAttributeEnumeration', and
-lter_metabase.'DataSetAttributeMissingCodes' tables.
+lter_metabase."DataSetAttributes", lter_metabase."ListCodes",
+lter_metabase."DataSetAttributeEnumeration", and
+lter_metabase."DataSetAttributeMissingCodes" tables.
 }
 \description{
 Create the DataSetAttributes and related tables from an EML list (emld object)

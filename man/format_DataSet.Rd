@@ -26,7 +26,7 @@ which will set the project tree and other elements.}
 }
 \value{
 A named list containing a dataframe formatted to match the
-lter_metabase.'DataSet' table
+lter_metabase."DataSet" table
 }
 \description{
 Create a list of template tables for metabase

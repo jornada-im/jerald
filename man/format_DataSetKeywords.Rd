@@ -13,7 +13,7 @@ format_DataSetKeywords(dsid, eml)
 }
 \value{
 A named list containing dataframes formatted to match the
-lter_metabase.'DataSetKeywords' and lter_metabase.'ListKeywords' tables
+lter_metabase."DataSetKeywords" and lter_metabase."ListKeywords" tables
 }
 \description{
 Create the DataSetKeywords and related tables from an EML list (emld object)

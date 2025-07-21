@@ -13,8 +13,8 @@ format_DataSetPersonnel(dsid, eml)
 }
 \value{
 A named list containing dataframes formatted to match the
-lter_metabase.'DataSetPersonnel', lter_metabase.'ListPeople', and
-lter_metabase.'ListPeopleID' tables
+lter_metabase."DataSetPersonnel", lter_metabase."ListPeople", and
+lter_metabase."ListPeopleID" tables
 }
 \description{
 Create the DataSetPersonnel and related tables from an EML list (emld object)

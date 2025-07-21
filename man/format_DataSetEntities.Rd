@@ -13,7 +13,7 @@ format_DataSetEntities(dsid, eml)
 }
 \value{
 A named list containing a dataframe formatted to match the
-lter_metabase.'DataSetEntities' table
+lter_metabase."DataSetEntities" table
 }
 \description{
 NOTE: currently this does not handle otherEntities

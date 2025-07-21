@@ -1,4 +1,4 @@
-#library('tidyverse')
+#library("tidyverse")
 
 #' Create a list of template tables for metabase
 
@@ -11,50 +11,50 @@
 #' @param boilerplate_id The identifier of a "boilerplate" record in metabase,
 #' which will set the project tree and other elements.
 #' @return A named list containing a dataframe formatted to match the 
-#' lter_metabase.'DataSet' table
+#' lter_metabase."DataSet" table
 #' @export
 format_DataSet <- function(dsid, eml,
                            revnum=0,
                            outpath=getwd(),
-                           boilerplate_id='jrn-default') {
+                           boilerplate_id="jrn-default") {
   # Write out the Abstract
   lines <- character(length(eml$dataset$abstract$para))
   for (i in 1:length(lines)) {
     print(eml$dataset$abstract$para[[i]])
     lines[[i]] <- eml$dataset$abstract$para[[i]]
   }
-  outfile = paste0('abstract.', dsid, '.ingress.md')
-  fileConn<-file(paste0(outpath, '/', outfile))
-  message(paste0('Writing ', paste0(outpath, '/', outfile)))
+  outfile = paste0("abstract.", dsid, ".ingress.md")
+  fileConn<-file(paste0(outpath, "/", outfile))
+  message(paste0("Writing ", paste0(outpath, "/", outfile)))
   writeLines(lines, fileConn)
   close(fileConn)
 
   # Now populate the DataSet table (one row for a new dataset)
   # Setting some defaults here... could revise
   mbtable <- data.frame(
-    'DataSetID'= dsid,
-    'Revision'= revnum,
-    'Title'= eml$dataset$title,
-    'PubDate'= return_if_node_exists(eml$dataset$pubDate),
-    'Abstract'= outfile, #unlist(eml$dataset$abstract),
-    'ShortName'= return_if_node_exists(eml$dataset$shortName),
-    'UpdateFrequency'= return_if_node_exists(eml$dataset$maintenance$maintenanceUpdateFrequency),
-    'MaintenanceDescription'= return_if_node_exists(eml$dataset$maintenance$description),
-    'AbstractType'= 'file',
-    'BoilerplateSetting'= boilerplate_id
+    "DataSetID"= dsid,
+    "Revision"= revnum,
+    "Title"= eml$dataset$title,
+    "PubDate"= return_if_node_exists(eml$dataset$pubDate),
+    "Abstract"= outfile, #unlist(eml$dataset$abstract),
+    "ShortName"= return_if_node_exists(eml$dataset$shortName),
+    "UpdateFrequency"= return_if_node_exists(eml$dataset$maintenance$maintenanceUpdateFrequency),
+    "MaintenanceDescription"= return_if_node_exists(eml$dataset$maintenance$description),
+    "AbstractType"= "file",
+    "BoilerplateSetting"= boilerplate_id
   )
   # Return a named list
-  return(list('DataSet' = mbtable))
+  return(list("DataSet" = mbtable))
 }
 
 # WIP!!!!
 format_DataSet2 <- function(mb, eml,
                            revnum=0,
                            outpath=getwd(),
-                           boilerplate_id='jrn-default') {
+                           boilerplate_id="jrn-default") {
   # Get the metabase datasetID and compare to eml
   dsid <- mb$DataSetID
-  if (dsid != strsplit(eml$packageId, '\\.')[[1]][[2]]){
+  if (dsid != strsplit(eml$packageId, "\\.")[[1]][[2]]){
     message("Warning: the metabase and eml dataset IDs don't match!")
   }
 
@@ -65,9 +65,9 @@ format_DataSet2 <- function(mb, eml,
     print(eml$dataset$abstract$para[[i]])
     lines[[i]] <- eml$dataset$abstract$para[[i]]
   }
-  outfile = paste0('abstract.', dsid, '.ingress.md')
-  fileConn<-file(paste0(outpath, '/', outfile))
-  message(paste0('Writing ', paste0(outpath, '/', outfile)))
+  outfile = paste0("abstract.", dsid, ".ingress.md")
+  fileConn<-file(paste0(outpath, "/", outfile))
+  message(paste0("Writing ", paste0(outpath, "/", outfile)))
   writeLines(lines, fileConn)
   close(fileConn)
 
@@ -80,7 +80,7 @@ format_DataSet2 <- function(mb, eml,
     return_if_node_exists(eml$dataset$shortName),
     return_if_node_exists(eml$dataset$maintenance$maintenanceUpdateFrequency),
     return_if_node_exists(eml$dataset$maintenance$description),
-    'file',
+    "file",
     boilerplate_id
   )
   )
@@ -88,7 +88,7 @@ format_DataSet2 <- function(mb, eml,
   stopifnot(identical(names(mb$DataSetID), names(mbtable)))
 
   # Return a named list
-  return(list('DataSet' = mbtable))
+  return(list("DataSet" = mbtable))
 }
 
 #' Create the DataSetMethod table from an EML list (emld object)
@@ -104,7 +104,7 @@ format_DataSet2 <- function(mb, eml,
 #' @param outpath The path to output a methods markdown file to. Defaults to
 #' current working directory
 #' @return A named list containing a dataframe formatted to match the 
-#' lter_metabase.'DataSetMethod' table
+#' lter_metabase."DataSetMethod" table
 #' @export
 format_DataSetMethod <- function(dsid, eml, outpath=getwd()){
   
@@ -115,7 +115,7 @@ format_DataSetMethod <- function(dsid, eml, outpath=getwd()){
   # n_sampling <- length(eml$dataset$methods$sampling$samplingDescription)
 
   # # If just one MethodStep
-  # if ('description' %in% names(eml$dataset$methods$methodStep)){
+  # if ("description" %in% names(eml$dataset$methods$methodStep)){
   #   lines <- return_if_node_exists(eml$dataset$methods$methodStep$description)
   # } else {
   # # Loop through multiple MethodSteps if present)
@@ -128,23 +128,23 @@ format_DataSetMethod <- function(dsid, eml, outpath=getwd()){
   # }
 
   # Unnest the eml and filter any methods elements into lines
-  lines <- unlist(eml)[grepl('methods', names(unlist(eml)), fixed=T)]
+  lines <- unlist(eml)[grepl("methods", names(unlist(eml)), fixed=T)]
   # Write out the methods 
-  outfile = paste0('methods.', dsid, '.ingress.md')
-  fileConn<-file(paste0(outpath, '/', outfile))
-  message(paste0('Writing ', paste0(outpath, '/', outfile)))
+  outfile = paste0("methods.", dsid, ".ingress.md")
+  fileConn<-file(paste0(outpath, "/", outfile))
+  message(paste0("Writing ", paste0(outpath, "/", outfile)))
   writeLines(lines, fileConn)
   close(fileConn)
   # Now make a DataSetMethod table referring to the file (assuming 1 Methods)
   mbtable <- data.frame(
-    'DataSetID' = dsid,
-    'MethodStepID' = 1,
-    'DescriptionType' = 'file',
-    'Description' = outfile,
-    'Method_xml' = NA
+    "DataSetID" = dsid,
+    "MethodStepID" = 1,
+    "DescriptionType" = "file",
+    "Description" = outfile,
+    "Method_xml" = NA
   )
   # Return a named list
-  return(list('DataSetMethod' = mbtable))
+  return(list("DataSetMethod" = mbtable))
 }
 
 
@@ -157,33 +157,33 @@ format_DataSetMethod <- function(dsid, eml, outpath=getwd()){
 #' @param outpath The path to output a methods markdown file to. Defaults to
 #' current working directory
 #' @return A named list containing a dataframe formatted to match the 
-#' lter_metabase.'DataSetMethod' table
+#' lter_metabase."DataSetMethod" table
 #' @export
 format_DataSetMethodProvenance <- function(dsid, eml, outpath=getwd()){
   # Get the data sources
   # If just one Methodstep
-  if ('dataSource' %in% names(eml$dataset$methods$methodStep)){
+  if ("dataSource" %in% names(eml$dataset$methods$methodStep)){
     dsource_url <- eml$dataset$methods$methodStep$dataSource$distribution$online$url
-    dsource <- paste(tail(strsplit(dsource_url, '/')[[1]], 3), collapse='.')
+    dsource <- paste(tail(strsplit(dsource_url, "/")[[1]], 3), collapse=".")
   } else {
   # loop through MethodSteps if present)
     dsources <- character(length(eml$dataset$methods$methodStep))
     for (i in 1:length(lines)) {
       print(eml$dataset$methods$methodStep[[i]]$description$para)
       dsource_url <- eml$dataset$methods$methodStep[[i]]$dataSource$distribution$online$url
-      dsources[[i]] <- paste(tail(strsplit(dsource_url, '/')[[1]], 3), collapse='.')
+      dsources[[i]] <- paste(tail(strsplit(dsource_url, "/")[[1]], 3), collapse=".")
     }
   }
   # Now make a DataSetMethodProvenance table referring to the file (assuming 1 Methods)
   mbtable <- data.frame(
-    'DataSetID' = dsid,
-    'MethodStepID' = 1,
-    'DescriptionType' = 'file',
-    'Description' = outfile,
-    'Method_xml' = NA
+    "DataSetID" = dsid,
+    "MethodStepID" = 1,
+    "DescriptionType" = "file",
+    "Description" = outfile,
+    "Method_xml" = NA
   )
   # Return a named list
-  return(list('DataSetMethod' = mbtable))
+  return(list("DataSetMethod" = mbtable))
 }
 
 
@@ -194,7 +194,7 @@ format_DataSetMethodProvenance <- function(dsid, eml, outpath=getwd()){
 #' @param dsid The dataset id value, which is the primary key for lter_metabase
 #' @param eml An emld object derived from an EML file
 #' @return A named list containing a dataframe formatted to match the 
-#' lter_metabase.'DataSetEntities' table
+#' lter_metabase."DataSetEntities" table
 #' @export
 format_DataSetEntities <- function(dsid, eml){
 
@@ -202,7 +202,7 @@ format_DataSetEntities <- function(dsid, eml){
   data_tables <- return_list_if_single(eml$dataset$dataTable)
   other_ents <- return_list_if_single(eml$dataset$otherEntity)
 
-  entities <- do.call('c', list(data_tables, other_ents))
+  entities <- do.call("c", list(data_tables, other_ents))
 
   # Preallocate lists for entities
   entsortorder <- numeric(length(entities))
@@ -227,10 +227,10 @@ format_DataSetEntities <- function(dsid, eml){
     #filetypes[i] <- eml$... some kind of check
     # The ifelse is for some minor attribute inconsistency in ezEML XML files
     if (length(entities[[i]]$physical$distribution$online$url) > 1){
-      filenames[i] <- tail(unlist(strsplit(entities[[i]]$physical$distribution$online$url$url, '/')), n=1)
+      filenames[i] <- tail(unlist(strsplit(entities[[i]]$physical$distribution$online$url$url, "/")), n=1)
       urlheads[i] <- unlist(strsplit(entities[[i]]$physical$distribution$online$url$url, filenames[i]))
     } else {
-      filenames[i] <- tail(unlist(strsplit(entities[[i]]$physical$distribution$online$url, '/')), n=1)
+      filenames[i] <- tail(unlist(strsplit(entities[[i]]$physical$distribution$online$url, "/")), n=1)
       urlheads[i] <- unlist(strsplit(entities[[i]]$physical$distribution$online$url, filenames[i]))
     }
     addinfo[i] = return_if_node_exists(entities[[i]]$physical$additionalInfo)
@@ -239,23 +239,23 @@ format_DataSetEntities <- function(dsid, eml){
     checksums[i] <- return_if_node_exists(entities[[i]]$physical$authentication$authentication)
   }
   # Make dataframe
-  mbtable <- data.frame('DataSetID'=dsid,
-                        'EntitySortOrder'=entsortorder,
-                        'EntityName'=entnames,
-                        'EntityType'='dataTable',
-                        'EntityDescription'=entdescs,
-                        'EntityRecords'=as.numeric(entrecords),
-                        'FileType'='csv_B', # sensible default but needs a check
-                        'Urlhead'=urlheads,
-                        'Subpath'=as.character(subpaths),
-                        'FileName'=filenames,
-                        'AdditionalInfo'=as.character(addinfo),
-                        'FileSize'=as.numeric(filesizes),
-                        'FileSizeUnits'=as.character(filesizeunits),
-                        'Checksum'=checksums
+  mbtable <- data.frame("DataSetID"=dsid,
+                        "EntitySortOrder"=entsortorder,
+                        "EntityName"=entnames,
+                        "EntityType"="dataTable",
+                        "EntityDescription"=entdescs,
+                        "EntityRecords"=as.numeric(entrecords),
+                        "FileType"="csv_B", # sensible default but needs a check
+                        "Urlhead"=urlheads,
+                        "Subpath"=as.character(subpaths),
+                        "FileName"=filenames,
+                        "AdditionalInfo"=as.character(addinfo),
+                        "FileSize"=as.numeric(filesizes),
+                        "FileSizeUnits"=as.character(filesizeunits),
+                        "Checksum"=checksums
   )
   # Return a named list
-  return(list('DataSetEntities' = mbtable))
+  return(list("DataSetEntities" = mbtable))
 }
 
 
@@ -264,9 +264,9 @@ format_DataSetEntities <- function(dsid, eml){
 #' @param dsid The dataset id value, which is the primary key for lter_metabase
 #' @param eml An emld object derived from an EML file
 #' @return A named list containing four dataframes formatted to match the 
-#' lter_metabase.'DataSetAttributes', lter_metabase.'ListCodes',
-#' lter_metabase.'DataSetAttributeEnumeration', and
-#' lter_metabase.'DataSetAttributeMissingCodes' tables.
+#' lter_metabase."DataSetAttributes", lter_metabase."ListCodes",
+#' lter_metabase."DataSetAttributeEnumeration", and
+#' lter_metabase."DataSetAttributeMissingCodes" tables.
 #' @export
 format_DataSetAttributes <- function(dsid, eml){
 
@@ -290,18 +290,18 @@ format_DataSetAttributes <- function(dsid, eml){
                     EntitySortOrder = i,
                     ColumnPosition = rownames(.),
                     AttributeID = attributeName,
-                    AttributeLabel = if("attributeLabel" %in% colnames(.)) attributeLabel else 'Unlabeled',
+                    AttributeLabel = if("attributeLabel" %in% colnames(.)) attributeLabel else "Unlabeled",
                     # Moosh two colums together and then replace values to mimic
                     # what is in metabase
                     MeasurementScaleDomainID = paste0(measurementScale, domain),
                     MeasurementScaleDomainID = dplyr::case_when(
-                        grepl('ratio', MeasurementScaleDomainID) ~ 'ratio',
-                        grepl('interval', MeasurementScaleDomainID) ~ 'interval',
-                        grepl('dateTime', MeasurementScaleDomainID) ~ 'dateTime',
-                        grepl('nominalenum', MeasurementScaleDomainID) ~ 'nominalEnum',
-                        grepl('ordinalenum', MeasurementScaleDomainID) ~ 'ordinalEnum',
-                        grepl('nominaltext', MeasurementScaleDomainID) ~ 'nominalText',
-                        grepl('ordinaltext', MeasurementScaleDomainID) ~ 'ordinalText'),
+                        grepl("ratio", MeasurementScaleDomainID) ~ "ratio",
+                        grepl("interval", MeasurementScaleDomainID) ~ "interval",
+                        grepl("dateTime", MeasurementScaleDomainID) ~ "dateTime",
+                        grepl("nominalenum", MeasurementScaleDomainID) ~ "nominalEnum",
+                        grepl("ordinalenum", MeasurementScaleDomainID) ~ "ordinalEnum",
+                        grepl("nominaltext", MeasurementScaleDomainID) ~ "nominalText",
+                        grepl("ordinaltext", MeasurementScaleDomainID) ~ "ordinalText"),
                     DateTimeFormatString = if("formatString" %in% colnames(.)) formatString else NA,
                     DateTimePrecision = if("dateTimePrecision" %in% colnames(.)) dateTimePrecision else NA,
                     TextPatternDefinition = if("definition" %in% colnames(.)) definition else NA,
@@ -323,7 +323,7 @@ format_DataSetAttributes <- function(dsid, eml){
     # Add the metabase formatted table to the list
     att_tbls[[i]] <- att_i
 
-    # 2. Create a missing values table to match metabase (DataSetAttributeMissingCodes)
+    # 2. Create missing values table for metabase (DataSetAttributeMissingCodes)
     miss_i <- attList$attributes %>% 
       dplyr::filter(!is.na(missingValueCodeExplanation)) %>%
       dplyr::mutate(DataSetID = dsid,
@@ -332,11 +332,12 @@ format_DataSetAttributes <- function(dsid, eml){
                     MissingValueCodeID=missingValueCode)
     missval_tbls[[i]] <- miss_i
 
-    # 3. Format the factors table to match metabase (DataSetAttributeEnumeration)
+    # 3. Format enumeration table for metabase (DataSetAttributeEnumeration)
     enum_i <- attList$factors %>% 
       dplyr::mutate(DataSetID = dsid,
                     EntitySortOrder = i) %>%
-      dplyr::select(DataSetID, EntitySortOrder,ColumnName=attributeName, CodeID=code)
+      dplyr::select(DataSetID, EntitySortOrder,ColumnName=attributeName,
+                    CodeID=code)
     # Add the metabase formatted table to the list
     attenum_tbls[[i]] <- enum_i
 
@@ -344,13 +345,13 @@ format_DataSetAttributes <- function(dsid, eml){
     # 4. Format unique codes to match metabase (ListCodes)
     # First get categorical codes from "factors" table
     code1_i <- attList$factors %>% 
-      dplyr::mutate(CodeID = paste('emlCode', code, sep='_')) %>%
+      dplyr::mutate(CodeID = paste("emlCode", code, sep="_")) %>%
       dplyr::select(CodeID, Code=code, CodeExplanation=definition)
 
     # Then missing codes from attributes table
     code2_i <- attList$attributes %>% 
       dplyr::filter(!is.na(missingValueCodeExplanation)) %>%
-      dplyr::mutate(CodeID = paste('emlMiss', missingValueCode, sep='_'),
+      dplyr::mutate(CodeID = paste("emlMiss", missingValueCode, sep="_"),
                     Code = missingValueCode,
                     CodeExplanation = missingValueCodeExplanation) %>%
       dplyr::select(CodeID, Code, CodeExplanation)
@@ -368,10 +369,10 @@ format_DataSetAttributes <- function(dsid, eml){
   listcodes <- unique(do.call(rbind, listcode_tbls)) # get unique rows
 
   # Return a named list
-  return(list('DataSetAttributes'=atts,
-              'ListCodes'=listcodes,
-              'DataSetAttributeEnumeration'=attenums,
-              'DataSetAttributeMissingCodes'=missvals)
+  return(list("DataSetAttributes"=atts,
+              "ListCodes"=listcodes,
+              "DataSetAttributeEnumeration"=attenums,
+              "DataSetAttributeMissingCodes"=missvals)
         )
 }
 
@@ -379,12 +380,13 @@ format_DataSetAttributes <- function(dsid, eml){
 #'
 #' @param dsid The dataset id value, which is the primary key for lter_metabase
 #' @param df A dataframe object or list of dataframes
+#' @param enum_cols A vector of column names that are categorical
 #' @return A named list containing four dataframes formatted to match the 
-#' lter_metabase.'DataSetAttributes', lter_metabase.'ListCodes',
-#' lter_metabase.'DataSetAttributeEnumeration', and
-#' lter_metabase.'DataSetAttributeMissingCodes' tables.
+#' lter_metabase."DataSetAttributes", lter_metabase."ListCodes",
+#' lter_metabase."DataSetAttributeEnumeration", and
+#' lter_metabase."DataSetAttributeMissingCodes" tables.
 #' @export
-format_DataSetAttributes_df <- function(dsid, df){
+format_DataSetAttributes_df <- function(dsid, df, enumcols_df = NULL){
 
   # First concatenate lists of all dataTable and otherEntity elements
   data_tables <- if (is.data.frame(df)) list(df) else df
@@ -398,11 +400,12 @@ format_DataSetAttributes_df <- function(dsid, df){
   # Loop and populate attribute tables
   for (i in 1:length(data_tables)) {
     # Initialize the attribute table
-    # First get classes out so we can remove parentclass difftime
+    # First get column classes. Sometimes class returns more than one item
     classes <- unlist(unname(sapply(df, class)))
     att_i_init <- data.frame(
       attributeName = names(df),
-      storageType = classes[! classes %in% c('difftime')],
+      # Remove the extra class items (difftime)
+      storageType = classes[! classes %in% c("difftime")],
       numMissing = unlist(unname(sapply(df, function(x) sum(is.na(x)))))
       )
 
@@ -415,41 +418,39 @@ format_DataSetAttributes_df <- function(dsid, df){
                     AttributeLabel = "Unlabeled",
                     Description = "No description",
                     StorageType = dplyr::case_when(
-                        storageType == 'factor' ~ 'string',
-                        storageType == 'character' ~ 'string',
-                        storageType == 'integer' ~ 'integer',
-                        storageType == 'numeric' ~ 'float',
-                        storageType == 'Date' ~ 'dateTime',
-                        storageType == 'hms' ~ 'dateTime',
-                        storageType == 'POSIXct' ~ 'dateTime',
-                        storageType == 'POSIXlt' ~ 'dateTime',
-                        storageType == 'logical' ~ 'boolean'
-                        ),
-                    # 
+                        storageType == "factor" ~ "string",
+                        storageType == "character" ~ "string",
+                        storageType == "integer" ~ "integer",
+                        storageType == "numeric" ~ "float",
+                        storageType == "Date" ~ "dateTime",
+                        storageType == "hms" ~ "dateTime",
+                        storageType == "POSIXct" ~ "dateTime",
+                        storageType == "POSIXlt" ~ "dateTime",
+                        storageType == "logical" ~ "boolean"
+                    ),
                     MeasurementScaleDomainID = dplyr::case_when(
-                        storageType == 'factor' ~ 'nominalEnum',
-                        storageType == 'character' ~ 'nominalText',
-                        storageType == 'integer' ~ 'interval',
-                        storageType == 'numeric' ~ 'ratio',
-                        storageType == 'Date' ~ 'dateTime',
-                        storageType == 'hms' ~ 'dateTime',
-                        storageType == 'POSIXct' ~ 'dateTime',
-                        storageType == 'POSIXlt' ~ 'dateTime',
-                        storageType == 'logical' ~ 'nominalEnum'
-                        ),
+                        # Evaluate enumcols argument first, 
+                        # then fill StorageType
+                        attributeName %in% enumcols_df ~ "nominalEnum",
+                        StorageType == "string" ~ "nominalText",
+                        StorageType == "integer" ~ "interval",
+                        StorageType == "float" ~ "ratio",
+                        StorageType == "dateTime" ~ "dateTime",
+                        StorageType == "boolean" ~ "nominalEnum",
+                    ),
                     DateTimeFormatString = dplyr::case_when(
-                        StorageType == 'dateTime' ~ "YYYY-MM-DD"),
+                        StorageType == "dateTime" ~ "YYYY-MM-DD"),
                     DateTimePrecision = dplyr::case_when(
-                        StorageType == 'dateTime' ~ 1),
+                        StorageType == "dateTime" ~ 1),
                     TextPatternDefinition = dplyr::case_when(
-                        MeasurementScaleDomainID == 'nominalText' ~ 'any text'),
+                        MeasurementScaleDomainID == "nominalText" ~ "any text"),
                     Unit = dplyr::case_when(
-                        MeasurementScaleDomainID == 'interval' ~ 'number',
-                        MeasurementScaleDomainID == 'ratio' ~ 'dimensionless'),
+                        MeasurementScaleDomainID == "interval" ~ "number",
+                        MeasurementScaleDomainID == "ratio" ~ "dimensionless"),
                     NumericPrecision = NA,
                     NumberType = dplyr::case_when(
-                        MeasurementScaleDomainID == 'interval' ~ 'integer',
-                        MeasurementScaleDomainID == 'ratio' ~ 'real'),
+                        MeasurementScaleDomainID == "interval" ~ "integer",
+                        MeasurementScaleDomainID == "ratio" ~ "real"),
                     BoundsMinimum = NA, 
                     BoundsMaximum = NA) %>%
       dplyr::select(DataSetID, EntitySortOrder, ColumnPosition,
@@ -463,55 +464,62 @@ format_DataSetAttributes_df <- function(dsid, df){
     # Add the metabase formatted table to the list
     att_tbls[[i]] <- att_i
 
-    # 2. Create a missing values table to match metabase (DataSetAttributeMissingCodes)
-
+    # 2. Create missing values table for metabase (DataSetAttributeMissingCodes)
     miss_i <- att_i_init %>% 
       dplyr::filter(numMissing > 0) %>%
+      # By default all codes are NA1 - will need review
       dplyr::mutate(DataSetID = dsid,
                     EntitySortOrder = i,
-                    MissingValueCodeID = "NA1") %>%
+                    MissingValueCodeID = "dfCode_NA") %>%
       dplyr::select(DataSetID, EntitySortOrder, ColumnName=attributeName,
                     MissingValueCodeID)
     missval_tbls[[i]] <- miss_i
 
-    # 3. Format the factors table to match metabase (DataSetAttributeEnumeration)
-    #enum_i <- att_i_init %>% 
-    #  dplyr::mutate(DataSetID = dsid,
-    #                EntitySortOrder = i) %>%
-    #  dplyr::select(DataSetID, EntitySortOrder,ColumnName=attributeName, CodeID=code)
+    # 3. Format enumeration table for metabase (DataSetAttributeEnumeration)
+    enumcols <- att_tbls[[i]] %>%
+      dplyr::filter(MeasurementScaleDomainID=="nominalEnum") %>%
+      dplyr::pull(ColumnName) %>% unique()
+    enum_i <- df[, enumcols] %>%
+      tidyr::pivot_longer(seq_along(enumcols), names_to = "ColumnName",
+                          values_to = "CodeID") %>%
+      dplyr::mutate(CodeID = paste("dfCode", CodeID, sep="_")) %>%
+      unique() %>% dplyr::mutate(DataSetID = dsid, EntitySortOrder = i) %>%
+      dplyr::select(DataSetID, EntitySortOrder,ColumnName, CodeID)
     # Add the metabase formatted table to the list
-    #attenum_tbls[[i]] <- enum_i
+    attenum_tbls[[i]] <- enum_i
 
 
     # 4. Format unique codes to match metabase (ListCodes)
     # First get categorical codes from "factors" table
-    #code1_i <- attList$factors %>% 
-    #  dplyr::mutate(CodeID = paste('emlCode', code, sep='_')) %>%
-    #  dplyr::select(CodeID, Code=code, CodeExplanation=definition)
+    code1_i <- attenum_tbls[[i]] %>%
+      dplyr::mutate(Code = stringr::str_replace(CodeID, "dfCode_", ""),
+                    CodeExplanation = paste("Explanation for enumerated code ", CodeID, sep=" ")) %>%
+      dplyr::select(CodeID, Code, CodeExplanation)
 
     # Then missing codes from attributes table
-    #code2_i <- attList$attributes %>% 
-    #  dplyr::filter(!is.na(missingValueCodeExplanation)) %>%
-    #  dplyr::mutate(CodeID = paste('emlMiss', missingValueCode, sep='_'),
-    #                Code = missingValueCode,
-    #                CodeExplanation = missingValueCodeExplanation) %>%
-    #  dplyr::select(CodeID, Code, CodeExplanation)
+    code2_i <- missval_tbls[[i]] %>% 
+      dplyr::mutate(Code = "NA",
+                    CodeExplanation = paste("Explanation for missing code ",
+                    MissingValueCodeID, sep=" ")) %>%
+      dplyr::select(CodeID=MissingValueCodeID, Code, CodeExplanation)
 
     # Concatenate categorical and missing codes
-    #code_i <- do.call(rbind, list(code1_i, code2_i))
+    code_i <- do.call(rbind, list(code1_i, code2_i))
     # join to ListCode list
-    #listcode_tbls[[i]] <- code_i
+    listcode_tbls[[i]] <- code_i
   }
 
   # Now join the collected tables
   atts <- do.call(rbind, att_tbls)
-  #attenums <- do.call(rbind, attenum_tbls)
+  attenums <- do.call(rbind, attenum_tbls)
   missvals <- do.call(rbind, missval_tbls)
-  #listcodes <- unique(do.call(rbind, listcode_tbls)) # get unique rows
+  listcodes <- unique(do.call(rbind, listcode_tbls)) # get unique rows
 
   # Return a named list
-  return(list('DataSetAttributes'=atts,
-              'DataSetAttributeMissingCodes'=missvals)
+  return(list("DataSetAttributes"=atts,
+              "DataSetAttributeMissingCodes"=missvals,
+              "DataSetAttributeEnumeration"=attenums,
+              "ListCodes"=listcodes)
         )
 }
 
@@ -526,7 +534,7 @@ format_DataSetAttributes_df <- function(dsid, df){
 suggest_ListCodes <- function(from_eml, from_metabase){
   # make some ListCode suggestions
   samecode <- from_metabase[from_metabase$Code %in% from_eml$Code,]
-  suggested <- merge(from_eml, samecode, by='Code', all=T, suffixes=c('_eml','_metabase'))
+  suggested <- merge(from_eml, samecode, by="Code", all=T, suffixes=c("_eml","_metabase"))
   return(suggested)
 }
 
@@ -536,7 +544,7 @@ suggest_ListCodes <- function(from_eml, from_metabase){
 #' @param dsid The dataset id value, which is the primary key for lter_metabase
 #' @param eml An emld object derived from an EML file
 #' @return A named list containing dataframes formatted to match the 
-#' lter_metabase.'DataSetKeywords' and lter_metabase.'ListKeywords' tables
+#' lter_metabase."DataSetKeywords" and lter_metabase."ListKeywords" tables
 #' @export
 format_DataSetKeywords <- function(dsid, eml){
   # Take the KeywordSet list and form into a rough dataframe
@@ -553,8 +561,8 @@ format_DataSetKeywords <- function(dsid, eml){
         }
     }
     # Add keywordType column if missing
-    if(!('keywordType' %in% names(df))){
-      df['keywordType'] <- NA
+    if(!("keywordType" %in% names(df))){
+      df["keywordType"] <- NA
     }
     # Join tibbles from each element
     if(i==1){df1 <- df
@@ -563,13 +571,13 @@ format_DataSetKeywords <- function(dsid, eml){
 
   # Replace missing and common thesaurus values with metabase equivalents
   df1 <- df1 %>%  
-    dplyr::mutate(Keyword = if_else(is.na(keyword), 'NA', keyword),
-      ThesaurusID = if_else(is.na(keywordThesaurus), 'none', keywordThesaurus),
-      ThesaurusID = gsub('\\(No thesaurus\\)', 'none', ThesaurusID),
-      ThesaurusID = if_else(grepl('lter core', tolower(ThesaurusID)),
-                                  'lter_cv_cra', ThesaurusID),
-      ThesaurusID = if_else(grepl('lter controlled', tolower(ThesaurusID)),
-                                  'lter_cv', ThesaurusID)
+    dplyr::mutate(Keyword = if_else(is.na(keyword), "NA", keyword),
+      ThesaurusID = if_else(is.na(keywordThesaurus), "none", keywordThesaurus),
+      ThesaurusID = gsub("\\(No thesaurus\\)", "none", ThesaurusID),
+      ThesaurusID = if_else(grepl("lter core", tolower(ThesaurusID)),
+                                  "lter_cv_cra", ThesaurusID),
+      ThesaurusID = if_else(grepl("lter controlled", tolower(ThesaurusID)),
+                                  "lter_cv", ThesaurusID)
     )
   # Reformat to get the DataSetKeywords table
   dskws <- df1 %>%
@@ -577,11 +585,11 @@ format_DataSetKeywords <- function(dsid, eml){
     dplyr::select(DataSetID, Keyword, ThesaurusID)
   # Reformat for ListKeywords table
   lkws <- df1 %>% 
-    dplyr::mutate(KeywordType = ifelse(is.na(keywordType), 'theme', keywordType)) %>%
+    dplyr::mutate(KeywordType = ifelse(is.na(keywordType), "theme", keywordType)) %>%
     dplyr::select(Keyword, ThesaurusID, KeywordType)
 
   # Return a named list
-  return(list('DataSetKeywords' = dskws, 'ListKeywords' = lkws))
+  return(list("DataSetKeywords" = dskws, "ListKeywords" = lkws))
 }
 
 
@@ -596,7 +604,7 @@ format_DataSetKeywords <- function(dsid, eml){
 suggest_Keywords <- function(from_eml, from_metabase){
   # make some ListKeywords suggestions
   samekw <- from_metabase[from_metabase$Keyword %in% from_eml$Keyword,]
-  suggested <- merge(from_eml, samekw, by='Keyword', all=T, suffixes=c('_eml','_metabase'))
+  suggested <- merge(from_eml, samekw, by="Keyword", all=T, suffixes=c("_eml","_metabase"))
   return(suggested)
 }
 
@@ -606,8 +614,8 @@ suggest_Keywords <- function(from_eml, from_metabase){
 #' @param dsid The dataset id value, which is the primary key for lter_metabase
 #' @param eml An emld object derived from an EML file
 #' @return A named list containing dataframes formatted to match the 
-#' lter_metabase.'DataSetPersonnel', lter_metabase.'ListPeople', and
-#' lter_metabase.'ListPeopleID' tables
+#' lter_metabase."DataSetPersonnel", lter_metabase."ListPeople", and
+#' lter_metabase."ListPeopleID" tables
 #' @export
 format_DataSetPersonnel <- function(dsid, eml){
 
@@ -617,13 +625,13 @@ format_DataSetPersonnel <- function(dsid, eml){
   assoc_parties <- return_list_if_single(eml$dataset$associatedParties)
   contacts <- return_list_if_single(eml$dataset$contact)
 
-  parties <- do.call('c', list(creators, contacts, assoc_parties))
+  parties <- do.call("c", list(creators, contacts, assoc_parties))
 
   # This doesn't work but there is probably a slick way to linearize the 
   # nested elements into a dataframe
   #df1 <- purrr::map(eml$dataset$creator, as_tibble) %>% 
   #  list_rbind() %>% 
-  #  unnest_wider(individualName, names_repair = 'unique' ,names_sep = 'x')
+  #  unnest_wider(individualName, names_repair = "unique" ,names_sep = "x")
 
   # Preallocate lists to hold personnel info
   partysortord <- numeric(length(parties))
@@ -656,15 +664,15 @@ format_DataSetPersonnel <- function(dsid, eml){
     org[i] <- return_if_node_exists(parties[[i]]$organizationName)
     email[i] <- return_if_node_exists(parties[[i]]$electronicMailAddress)
     pos[i] <- return_if_node_exists(parties[[i]]$positionName)
-    iddir[i] <- return_if_node_exists(parties[[i]]$userId, 'directory')
-    id[i] <- return_if_node_exists(parties[[i]]$userId, 'userId')
+    iddir[i] <- return_if_node_exists(parties[[i]]$userId, "directory")
+    id[i] <- return_if_node_exists(parties[[i]]$userId, "userId")
     # Since we joined contacts, assoc, and contacts, AuthorshipRole varies with
     # iteration. Choose the value depending what part of list we're in
     if (i %in% 1:length(creators)){
-      roles[i] <- 'creator'
+      roles[i] <- "creator"
       partysortord[i] <- i
     } else if (i %in% (length(creators)+1):(length(creators)+length(contacts))){
-      roles[i] <- 'contact'
+      roles[i] <- "contact"
       partysortord[i] <- i - length(creators)
     } else {
       roles[i] <- parties[[i]]$role
@@ -672,36 +680,36 @@ format_DataSetPersonnel <- function(dsid, eml){
     }
   }
   # Create the DataSetPersonnel, ListPeople, and ListPeopleID dataframes
-  parties_ds <- data.frame('DataSetID'=dsid,
-                            'NameID'=nameid,
-                            'AuthorshipOrder'=partysortord,
-                            'AuthorshipRole'=roles)
+  parties_ds <- data.frame("DataSetID"=dsid,
+                            "NameID"=nameid,
+                            "AuthorshipOrder"=partysortord,
+                            "AuthorshipRole"=roles)
 
-  parties_l <- data.frame('NameID'=nameid,
-                           'GivenName'=as.character(givennm),
-                           'MiddleName'=as.character(middlenm),
-                           'SurName'=as.character(surnm),
-                           'Organization'=as.character(org),
-                           'Address1'=as.character(add1),
-                           'Address2'=as.character(add2),
-                           'Address3'=as.character(add3),
-                           'City'=as.character(city),
-                           'State'=as.character(state),
-                           'Country'=as.character(country),
-                           'ZipCode'=as.character(zipcode),
-                           'Email'=as.character(email),
-                           'WebPage'=as.character(weburl),
-                           'Phone'=as.character(phone),
-                           'Position'=pos)
+  parties_l <- data.frame("NameID"=nameid,
+                           "GivenName"=as.character(givennm),
+                           "MiddleName"=as.character(middlenm),
+                           "SurName"=as.character(surnm),
+                           "Organization"=as.character(org),
+                           "Address1"=as.character(add1),
+                           "Address2"=as.character(add2),
+                           "Address3"=as.character(add3),
+                           "City"=as.character(city),
+                           "State"=as.character(state),
+                           "Country"=as.character(country),
+                           "ZipCode"=as.character(zipcode),
+                           "Email"=as.character(email),
+                           "WebPage"=as.character(weburl),
+                           "Phone"=as.character(phone),
+                           "Position"=pos)
 
-  parties_l_id <- data.frame('NameID'=nameid,
-                             'IdentificationID'=1,
-                             'IdentificationSystem'=as.character(iddir),
-                             'IdentificationURL'=as.character(id))
+  parties_l_id <- data.frame("NameID"=nameid,
+                             "IdentificationID"=1,
+                             "IdentificationSystem"=as.character(iddir),
+                             "IdentificationURL"=as.character(id))
 
   # Return a named list
-  return(list('DataSetPersonnel' = parties_ds, 'ListPeople' = parties_l,
-              'ListPeopleID' = parties_l_id))
+  return(list("DataSetPersonnel" = parties_ds, "ListPeople" = parties_l,
+              "ListPeopleID" = parties_l_id))
 }
 
 
@@ -710,19 +718,19 @@ format_DataSetPersonnel <- function(dsid, eml){
 #' @param dsid The dataset id value, which is the primary key for lter_metabase
 #' @param eml An emld object derived from an EML file
 #' @return A named list containing a dataframe formatted to match the 
-#' lter_metabase.'DataSetTemporal' table
+#' lter_metabase."DataSetTemporal" table
 #' @export
 format_DataSetTemporal <- function(dsid, eml){
   # Populate the DataSetTemporal table (assuming 1 row)
   # Setting some defaults here... could revise
   mbtable <- data.frame(
-    'DataSetID'=dsid,
-    'EntitySortOrder'=0,
-    'BeginDate'=eml$dataset$coverage$temporalCoverage$rangeOfDates$beginDate$calendarDate,
-    'EndDate'=eml$dataset$coverage$temporalCoverage$rangeOfDates$endDate$calendarDate,
-    'UseOnlyYear'=FALSE
+    "DataSetID"=dsid,
+    "EntitySortOrder"=0,
+    "BeginDate"=eml$dataset$coverage$temporalCoverage$rangeOfDates$beginDate$calendarDate,
+    "EndDate"=eml$dataset$coverage$temporalCoverage$rangeOfDates$endDate$calendarDate,
+    "UseOnlyYear"=FALSE
     )
-  return(list('DataSetTemporal' = mbtable))
+  return(list("DataSetTemporal" = mbtable))
 }
 
 
@@ -731,7 +739,7 @@ format_DataSetTemporal <- function(dsid, eml){
 #' @param dsid The dataset id value, which is the primary key for lter_metabase
 #' @param eml An emld object derived from an EML file
 #' @return A named list containing dataframes formatted to match the 
-#' lter_metabase.'DataSetSites' and lter_metabase.'ListSites' tables
+#' lter_metabase."DataSetSites" and lter_metabase."ListSites" tables
 #' @export
 format_DataSetSites <- function(dsid, eml){
   # Get the geographic coverage elements as a list
@@ -759,7 +767,7 @@ format_DataSetSites <- function(dsid, eml){
 
   # Loop and populate Geo Coverage tables
   for (i in 1:length(geocov)) {
-    siteid[i] <- paste0('unknown', i)
+    siteid[i] <- paste0("unknown", i)
     entsortord[i] <- 0
     geosortord[i] <- i
     # Test if the east/west and north/south bounding coords are the same
@@ -769,14 +777,14 @@ format_DataSetSites <- function(dsid, eml){
                 geocov[[i]]$boundingCoordinates$southBoundingCoordinate)
     # If they are its a point, and fill in center coords
     if (test1 & test2){
-      sitetype[i] <- 'point'
-      shapetype[i] <- 'point'
+      sitetype[i] <- "point"
+      shapetype[i] <- "point"
       centlon[i] <- geocov[[i]]$boundingCoordinates$westBoundingCoordinate
       centlat[i] <- geocov[[i]]$boundingCoordinates$northBoundingCoordinate
     # Otherwise its a bbox
     } else {
-      sitetype[i] <- 'bbox'
-      shapetype[i] <- 'polygon'
+      sitetype[i] <- "bbox"
+      shapetype[i] <- "polygon"
     }
     sitedesc[i] <- return_if_node_exists(geocov[[i]]$geographicDescription)
     wlon[i] <- geocov[[i]]$boundingCoordinates$westBoundingCoordinate
@@ -786,30 +794,30 @@ format_DataSetSites <- function(dsid, eml){
   }
 
   # Create the DataSetSites and ListSites dataframes
-  sites_ds <- data.frame('DataSetID'=dsid,
-                         'EntitySortOrder'=entsortord,
-                         'SiteID'=siteid,
-                         'GeoCoverageSortOrder'=geosortord)
+  sites_ds <- data.frame("DataSetID"=dsid,
+                         "EntitySortOrder"=entsortord,
+                         "SiteID"=siteid,
+                         "GeoCoverageSortOrder"=geosortord)
 
-  sites_l <- data.frame('SiteID'=siteid,
-                        'SiteType'=sitetype,
-                        'SiteName'=as.character(sitename),
-                        'SiteLocation'=as.character(siteloc),
-                        'SiteDescription'=as.character(sitedesc),
-                        'Ownership'=as.character(owners),
-                        'ShapeType'=as.character(shapetype),
-                        'CenterLon'=as.numeric(centlon),
-                        'CenterLat'=as.numeric(centlat),
-                        'WBoundLon'=as.numeric(wlon),
-                        'EBoundLon'=as.numeric(elon),
-                        'SBoundLat'=as.numeric(slat),
-                        'NBoundLat'=as.numeric(nlat),
-                        'AltitudeMin'=as.numeric(altmin),
-                        'AltitudeMax'=as.numeric(altmax),
-                        'AltitudeUnit'=as.character(altunit)
+  sites_l <- data.frame("SiteID"=siteid,
+                        "SiteType"=sitetype,
+                        "SiteName"=as.character(sitename),
+                        "SiteLocation"=as.character(siteloc),
+                        "SiteDescription"=as.character(sitedesc),
+                        "Ownership"=as.character(owners),
+                        "ShapeType"=as.character(shapetype),
+                        "CenterLon"=as.numeric(centlon),
+                        "CenterLat"=as.numeric(centlat),
+                        "WBoundLon"=as.numeric(wlon),
+                        "EBoundLon"=as.numeric(elon),
+                        "SBoundLat"=as.numeric(slat),
+                        "NBoundLat"=as.numeric(nlat),
+                        "AltitudeMin"=as.numeric(altmin),
+                        "AltitudeMax"=as.numeric(altmax),
+                        "AltitudeUnit"=as.character(altunit)
   )
   # Return a named list
-  return(list('DataSetSites' = sites_ds, 'ListSites' = sites_l))
+  return(list("DataSetSites" = sites_ds, "ListSites" = sites_l))
 }
 
 
@@ -819,10 +827,10 @@ format_DataSetSites <- function(dsid, eml){
 #' @param tablename Name (char) of a table in the given schema in LTER Metabase
 #' @param df A dataframe formatted to match the given LTER Metabase table
 #' @param schema Name (char) of the LTER Metabase schema to target 
-#' ('lter_metabase' by default)
+#' ("lter_metabase" by default)
 #' @return Nothing
 #' @export
-ingress_table <- function(conn, tablename, df, schema='lter_metabase'){
+ingress_table <- function(conn, tablename, df, schema="lter_metabase"){
   # Write to the named table and print output
   out <- RPostgres::dbWriteTable(conn, DBI::Id(schema = schema,
                                               table = tablename),
@@ -846,14 +854,14 @@ return_if_node_exists <- function(qlist, nodeid=1){
     val = NA
   }
   # If present return a named (character) element in qlist, or NA if not present
-  else if (class(nodeid)=='character'){
+  else if (class(nodeid)=="character"){
     if (exists(nodeid, where=qlist)) {
       val = qlist[[nodeid]]
     } else {
       val = NA
     }
   # Return an indexed element in qlist, or NA if not present (first is default)
-  } else if (class(nodeid)=='numeric'){
+  } else if (class(nodeid)=="numeric"){
     if (length(qlist) >= nodeid){
       val = qlist[[nodeid]]
     } else {

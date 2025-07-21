@@ -4,18 +4,20 @@
 \alias{format_DataSetAttributes_df}
 \title{Create the DataSetAttributes and related tables from a dataframe}
 \usage{
-format_DataSetAttributes_df(dsid, df)
+format_DataSetAttributes_df(dsid, df, enumcols_df = NULL)
 }
 \arguments{
 \item{dsid}{The dataset id value, which is the primary key for lter_metabase}
 
 \item{df}{A dataframe object or list of dataframes}
+
+\item{enum_cols}{A vector of column names that are categorical}
 }
 \value{
 A named list containing four dataframes formatted to match the
-lter_metabase.'DataSetAttributes', lter_metabase.'ListCodes',
-lter_metabase.'DataSetAttributeEnumeration', and
-lter_metabase.'DataSetAttributeMissingCodes' tables.
+lter_metabase."DataSetAttributes", lter_metabase."ListCodes",
+lter_metabase."DataSetAttributeEnumeration", and
+lter_metabase."DataSetAttributeMissingCodes" tables.
 }
 \description{
 Create the DataSetAttributes and related tables from a dataframe

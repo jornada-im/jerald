@@ -13,7 +13,7 @@ format_DataSetTemporal(dsid, eml)
 }
 \value{
 A named list containing a dataframe formatted to match the
-lter_metabase.'DataSetTemporal' table
+lter_metabase."DataSetTemporal" table
 }
 \description{
 Create the DataSetTemporal table from an EML list (emld object)

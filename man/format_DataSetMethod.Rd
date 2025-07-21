@@ -16,7 +16,7 @@ current working directory}
 }
 \value{
 A named list containing a dataframe formatted to match the
-lter_metabase.'DataSetMethod' table
+lter_metabase."DataSetMethod" table
 }
 \description{
 Methods elements vary widely and may have complex nesting structures. In

@@ -14,7 +14,7 @@ ingress_table(conn, tablename, df, schema = "lter_metabase")
 \item{df}{A dataframe formatted to match the given LTER Metabase table}
 
 \item{schema}{Name (char) of the LTER Metabase schema to target
-('lter_metabase' by default)}
+("lter_metabase" by default)}
 }
 \value{
 Nothing

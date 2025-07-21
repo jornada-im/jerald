@@ -13,7 +13,7 @@ format_DataSetSites(dsid, eml)
 }
 \value{
 A named list containing dataframes formatted to match the
-lter_metabase.'DataSetSites' and lter_metabase.'ListSites' tables
+lter_metabase."DataSetSites" and lter_metabase."ListSites" tables
 }
 \description{
 Create the DataSetSites and related tables from an EML list (emld object)
