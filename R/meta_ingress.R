@@ -470,7 +470,7 @@ format_DataSetAttributes_df <- function(dsid, df, enumcols_df = NULL){
       # By default all codes are NA1 - will need review
       dplyr::mutate(DataSetID = dsid,
                     EntitySortOrder = i,
-                    MissingValueCodeID = "dfCode_NA") %>%
+                    MissingValueCodeID = "dfMiss_NA") %>%
       dplyr::select(DataSetID, EntitySortOrder, ColumnName=attributeName,
                     MissingValueCodeID)
     missval_tbls[[i]] <- miss_i
