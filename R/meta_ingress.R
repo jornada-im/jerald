@@ -390,7 +390,7 @@ format_DataSetAttributes_df <- function(dsid, df, enumcols_df = NULL){
 
   # First concatenate lists of all dataTable and otherEntity elements
   data_tables <- if (is.data.frame(df)) list(df) else df
-
+  print(length(data_tables))
   # Preallocate lists to hold tables
   att_tbls <- vector("list", length = length(data_tables))
   attenum_tbls <- vector("list", length = length(data_tables))
@@ -401,12 +401,12 @@ format_DataSetAttributes_df <- function(dsid, df, enumcols_df = NULL){
   for (i in 1:length(data_tables)) {
     # Initialize the attribute table
     # First get column classes. Sometimes class returns more than one item
-    classes <- unlist(unname(sapply(df, class)))
+    classes <- unlist(unname(sapply(data_tables[[i]], class)))
     att_i_init <- data.frame(
-      attributeName = names(df),
+      attributeName = names(data_tables[[i]]),
       # Remove the extra class items (difftime)
-      storageType = classes[! classes %in% c("difftime")],
-      numMissing = unlist(unname(sapply(df, function(x) sum(is.na(x)))))
+      storageType = classes[!classes %in% c("difftime")],
+      numMissing = unlist(unname(sapply(data_tables[[i]], function(x) sum(is.na(x)))))
       )
 
     # 1. Format the attributes table to match metabase (DataSetAttributes)
@@ -479,7 +479,7 @@ format_DataSetAttributes_df <- function(dsid, df, enumcols_df = NULL){
     enumcols <- att_tbls[[i]] %>%
       dplyr::filter(MeasurementScaleDomainID=="nominalEnum") %>%
       dplyr::pull(ColumnName) %>% unique()
-    enum_i <- df[, enumcols] %>%
+    enum_i <- data_tables[[i]][, enumcols] %>%
       tidyr::pivot_longer(seq_along(enumcols), names_to = "ColumnName",
                           values_to = "CodeID") %>%
       dplyr::mutate(CodeID = paste("dfCode", CodeID, sep="_")) %>%
