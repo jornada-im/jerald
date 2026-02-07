@@ -4,10 +4,10 @@
 \alias{edi_login}
 \title{Check EDI login status}
 \usage{
-edi_login(edi.cred)
+edi_login(edi_cred)
 }
 \arguments{
-\item{edi.cred}{EDI credentials in a list}
+\item{edi_cred}{EDI credentials in a list}
 }
 \description{
 This function checks whether we are logged into EDI by looking at the

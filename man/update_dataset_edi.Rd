@@ -6,31 +6,31 @@
 \usage{
 update_dataset_edi(
   datasetid,
-  mb.name,
-  mb.cred,
-  edi.cred,
-  edi.env = "staging",
+  mb_name,
+  mb_cred,
+  edi_cred,
+  edi_env = "staging",
   publish = FALSE,
-  bucket.name = Sys.getenv("AWS_S3_BUCKETNAME")
+  bucket_name = Sys.getenv("AWS_S3_BUCKETNAME")
 )
 }
 \arguments{
 \item{datasetid}{ID number of the dataset to find in metabase and
 update in EDI}
 
-\item{mb.name}{name of the metabase database in the postgres cluster}
+\item{mb_name}{name of the metabase database in the postgres cluster}
 
-\item{mb.cred}{list of credentials for the metabase postgres cluster}
+\item{mb_cred}{list of credentials for the metabase postgres cluster}
 
-\item{edi.cred}{list of credentials to use for EDI}
+\item{edi_cred}{list of credentials to use for EDI}
 
-\item{edi.env}{name of the EDI environment to update (staging, production,
+\item{edi_env}{name of the EDI environment to update (staging, production,
 or development)}
 
 \item{publish}{boolean value - publish if TRUE, end before s3 upload if
 FALSE}
 
-\item{bucket.name}{name of the s3 bucket to push data entities to}
+\item{bucket_name}{name of the s3 bucket to push data entities to}
 }
 \description{
 This function updates an existing dataset (or "data package") at the EDI

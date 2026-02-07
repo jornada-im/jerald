@@ -6,43 +6,46 @@
 \usage{
 publish_dataset_edi(
   datasetid,
-  mb.name,
-  mb.cred,
-  edi.cred,
-  edi.env = "staging",
-  dry.run = TRUE,
-  s3.upload = TRUE,
-  multi.part = FALSE,
+  mb_name,
+  mb_cred,
+  edi_cred,
+  edi_env = "staging",
+  dry_run = TRUE,
+  s3_upload = TRUE,
+  multi_part = FALSE,
   skip_checks = FALSE,
-  bucket.name = Sys.getenv("AWS_S3_BUCKETNAME")
+  bucket_name = Sys.getenv("AWS_S3_BUCKETNAME")
 )
 }
 \arguments{
 \item{datasetid}{ID number of the dataset to find in metabase and
 update in EDI}
 
-\item{mb.name}{name of the metabase database in the postgres cluster}
+\item{mb_name}{name of the metabase database in the postgres cluster}
 
-\item{mb.cred}{list of credentials for the metabase postgres cluster}
+\item{mb_cred}{list of credentials for the metabase postgres cluster}
 
-\item{edi.cred}{list of credentials to use for EDI}
+\item{edi_cred}{list of credentials to use for EDI}
 
-\item{edi.env}{name of the EDI environment to update (staging, production,
+\item{edi_env}{name of the EDI environment to update (staging, production,
 or development)}
 
-\item{dry.run}{boolean value - write EML only, then stop (end before s3
+\item{dry_run}{boolean value - write EML only, then stop (end before s3
 and EDI upload) if TRUE, continue to publish if FALSE}
 
-\item{s3.upload}{boolean value (T/F) if TRUE upload to the s3 bucket, if
+\item{s3_upload}{boolean value (T/F) if TRUE upload to the s3 bucket, if
 FALSE skip this (entities already there). Note that this does not currently
 do a check on whether entities are present or not.}
+
+\item{multi_part}{boolean value (T/F) if TRUE upload to the s3 bucket using
+multipart method}
 
 \item{skip_checks}{boolean value (T/F) indicating whether or not to check
 for congruence between data entity and attribute metadata
 (check_attribute_congruence function). May want to set as True if the data
 are online and not in the working directory.}
 
-\item{bucket.name}{name of the s3 bucket to push data entities to}
+\item{bucket_name}{name of the s3 bucket to push data entities to}
 }
 \description{
 This function publishes a dataset (or "data package") at the EDI

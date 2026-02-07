@@ -67,53 +67,53 @@ load_destination_cred <- function(path){
 #'
 #' @param datasetid ID number of the dataset to find in metabase and 
 #' update in EDI
-#' @param mb.cred list of credentials for the metabase postgres cluster
-#' @param mb.name name of the metabase database in the postgres cluster
-#' @param edi.cred list of credentials to use for EDI
-#' @param edi.env name of the EDI environment to update (staging, production,
+#' @param mb_cred list of credentials for the metabase postgres cluster
+#' @param mb_name name of the metabase database in the postgres cluster
+#' @param edi_cred list of credentials to use for EDI
+#' @param edi_env name of the EDI environment to update (staging, production,
 #' or development)
 #' @param publish boolean value - publish if TRUE, end before s3 upload if 
 #' FALSE
-#' @param bucket.name name of the s3 bucket to push data entities to
+#' @param bucket_name name of the s3 bucket to push data entities to
 #' @export
 update_dataset_edi <- function(datasetid,
-                               mb.name,
-                               mb.cred,
-                               edi.cred,
-                               edi.env='staging',
+                               mb_name,
+                               mb_cred,
+                               edi_cred,
+                               edi_env='staging',
                                publish=FALSE,
-                               bucket.name=Sys.getenv('AWS_S3_BUCKETNAME')){
+                               bucket_name=Sys.getenv('AWS_S3_BUCKETNAME')){
   warning(paste('This function (update_dataset_edi) is now deprecated and will', 
                 'be removed from a future version of jerald. Use',
                 'publish_dataset_edi instead'), immediate=T)
   
   # Collect metadata into EML list from Metabase (using MetaEgress)
-  eml.list <- eml_egress(datasetid, mb.name, mb.cred)
+  eml_list <- eml_egress(datasetid, mb_name, mb_cred)
   # Revision number in metabase
-  rev.mb <- unlist(strsplit(eml.list$packageId, ".", fixed=TRUE))[3]
+  rev.mb <- unlist(strsplit(eml_list$packageId, ".", fixed=TRUE))[3]
   rev.mb <- as.numeric(rev.mb)
   
   # Update the revision numbers using EDI
-  eml.list.new <- increment_edi_revision(eml.list, edi.env=edi.env)
-  rev.next <- unlist(strsplit(eml.list.new$packageId, ".", fixed=TRUE))[3]
+  eml_list_new <- increment_edi_revision(eml_list, edi_env=edi_env)
+  rev.next <- unlist(strsplit(eml_list_new$packageId, ".", fixed=TRUE))[3]
   rev.next <- as.numeric(rev.next)
   if (rev.next==1){
-    stop("To create a new package in EDI ", edi.env, ", use the 
+    stop("To create a new package in EDI ", edi_env, ", use the 
          `create_dataset_edi` function")
   }
   # Warn if the revisions on metabase and EDI don't match
   #if (rev.mb!=(rev.next-1)){
   #  warning("The metabase revision (", rev.mb, "), does not match the EDI ",
-  #          edi.env, "revision (", rev.next-1, ").")
+  #          edi_env, "revision (", rev.next-1, ").")
   #}
   
   # Validate and serialize (write) EML document
   message('Validating EML...')
-  out <- EML::eml_validate(eml.list.new)
+  out <- EML::eml_validate(eml_list_new)
   message(out)
   message('Writing EML...')
-  emlfile <- paste0(eml.list.new$packageId, ".xml")
-  EML::write_eml(eml.list.new, file=emlfile)
+  emlfile <- paste0(eml_list_new$packageId, ".xml")
+  EML::write_eml(eml_list_new, file=emlfile)
   message('Done.\n')
   
   if (!publish){
@@ -124,11 +124,11 @@ update_dataset_edi <- function(datasetid,
   }
   
   # Collect the data entities from the eml list & push to s3 bucket
-  ents <- get_eml_entities(eml.list.new)
-  ents_to_s3(ents, bucket.name)
+  ents <- get_eml_entities(eml_list_new)
+  ents_to_s3(ents, bucket_name)
   
   # Update package on EDI
-  edi_update_package(emlfile, edi.cred, edi.env=edi.env)
+  edi_update_package(emlfile, edi_cred, edi_env=edi_env)
 }
 
 
@@ -151,53 +151,53 @@ update_dataset_edi <- function(datasetid,
 #'
 #' @param datasetid ID number of the dataset to find in metabase and 
 #' update in EDI
-#' @param mb.cred list of credentials for the metabase postgres cluster
-#' @param mb.name name of the metabase database in the postgres cluster
-#' @param edi.cred list of credentials to use for EDI
-#' @param edi.env name of the EDI environment to update (staging, production,
+#' @param mb_cred list of credentials for the metabase postgres cluster
+#' @param mb_name name of the metabase database in the postgres cluster
+#' @param edi_cred list of credentials to use for EDI
+#' @param edi_env name of the EDI environment to update (staging, production,
 #' or development)
 #' @param publish boolean value - publish if TRUE, end before s3 upload if 
 #' FALSE
-#' @param bucket.name name of the s3 bucket to push data entities to
+#' @param bucket_name name of the s3 bucket to push data entities to
 #' @export
 create_dataset_edi <- function(datasetid,
-                               mb.name,
-                               mb.cred,
-                               edi.cred,
-                               edi.env='staging',
+                               mb_name,
+                               mb_cred,
+                               edi_cred,
+                               edi_env='staging',
                                publish=FALSE,
-                               bucket.name=Sys.getenv('AWS_S3_BUCKETNAME')){
+                               bucket_name=Sys.getenv('AWS_S3_BUCKETNAME')){
   warning(paste('This function (create_dataset_edi) is now deprecated and will', 
           'be removed from a future version of jerald. Use',
           'publish_dataset_edi instead'), immediate=T)
   
   # Collect metadata into EML list from Metabase (using MetaEgress)
-  eml.list <- eml_egress(datasetid, mb.name, mb.cred)
+  eml_list <- eml_egress(datasetid, mb_name, mb_cred)
   # Revision number in metabase
-  rev.mb <- unlist(strsplit(eml.list$packageId, ".", fixed=TRUE))[3]
+  rev.mb <- unlist(strsplit(eml_list$packageId, ".", fixed=TRUE))[3]
   rev.mb <- as.numeric(rev.mb)
   
   # Update the revision numbers using EDI
-  eml.list.new <- increment_edi_revision(eml.list, edi.env=edi.env)
-  rev.next <- unlist(strsplit(eml.list.new$packageId, ".", fixed=TRUE))[3]
+  eml_list_new <- increment_edi_revision(eml_list, edi_env=edi_env)
+  rev.next <- unlist(strsplit(eml_list_new$packageId, ".", fixed=TRUE))[3]
   rev.next <- as.numeric(rev.next)
   if (rev.next>1){
-    stop("This package already exists at EDI ", edi.env, ". Use the
+    stop("This package already exists at EDI ", edi_env, ". Use the
          `update_dataset_edi` function")
   }
   # Warn if the revisions on metabase and EDI don't match
   #if (rev.mb != (rev.next-1)){
   #  warning("The metabase revision (", rev.mb, "), does not match the EDI ",
-  #          edi.env, "revision (", rev.next-1, ").")
+  #          edi_env, "revision (", rev.next-1, ").")
   #}
   
   # Validate and serialize (write) EML document
   message('Validating EML...')
-  out <- EML::eml_validate(eml.list.new)
+  out <- EML::eml_validate(eml_list_new)
   message(out)
   message('Writing EML...')
-  emlfile <- paste0(eml.list.new$packageId, ".xml")
-  EML::write_eml(eml.list.new, file=emlfile)
+  emlfile <- paste0(eml_list_new$packageId, ".xml")
+  EML::write_eml(eml_list_new, file=emlfile)
   message('Done.\n')
   
   if (!publish){
@@ -208,11 +208,11 @@ create_dataset_edi <- function(datasetid,
   }
   
   # Collect the data entities from the eml list & push to s3 bucket
-  ents <- get_eml_entities(eml.list.new)
-  ents_to_s3(ents, bucket.name)
+  ents <- get_eml_entities(eml_list_new)
+  ents_to_s3(ents, bucket_name)
   
   # Update package on EDI
-  edi_create_package(emlfile, edi.cred, edi.env=edi.env)
+  edi_create_package(emlfile, edi_cred, edi_env=edi_env)
 }
 
 
@@ -235,40 +235,42 @@ create_dataset_edi <- function(datasetid,
 #'
 #' @param datasetid ID number of the dataset to find in metabase and 
 #' update in EDI
-#' @param mb.cred list of credentials for the metabase postgres cluster
-#' @param mb.name name of the metabase database in the postgres cluster
-#' @param edi.cred list of credentials to use for EDI
-#' @param edi.env name of the EDI environment to update (staging, production,
+#' @param mb_cred list of credentials for the metabase postgres cluster
+#' @param mb_name name of the metabase database in the postgres cluster
+#' @param edi_cred list of credentials to use for EDI
+#' @param edi_env name of the EDI environment to update (staging, production,
 #' or development)
-#' @param dry.run boolean value - write EML only, then stop (end before s3 
+#' @param dry_run boolean value - write EML only, then stop (end before s3 
 #' and EDI upload) if TRUE, continue to publish if FALSE
-#' @param s3.upload boolean value (T/F) if TRUE upload to the s3 bucket, if 
+#' @param s3_upload boolean value (T/F) if TRUE upload to the s3 bucket, if 
 #' FALSE skip this (entities already there). Note that this does not currently
 #' do a check on whether entities are present or not. 
+#' @param multi_part boolean value (T/F) if TRUE upload to the s3 bucket using
+#' multipart method
 #' @param skip_checks boolean value (T/F) indicating whether or not to check
 #' for congruence between data entity and attribute metadata 
 #' (check_attribute_congruence function). May want to set as True if the data
 #' are online and not in the working directory.
-#' @param bucket.name name of the s3 bucket to push data entities to
+#' @param bucket_name name of the s3 bucket to push data entities to
 #' @export
 publish_dataset_edi <- function(datasetid,
-                               mb.name,
-                               mb.cred,
-                               edi.cred,
-                               edi.env='staging',
-                               dry.run=TRUE,
-                               s3.upload=TRUE,
-                               multi.part=FALSE,
+                               mb_name,
+                               mb_cred,
+                               edi_cred,
+                               edi_env='staging',
+                               dry_run=TRUE,
+                               s3_upload=TRUE,
+                               multi_part=FALSE,
                                skip_checks=FALSE,
-                               bucket.name=Sys.getenv('AWS_S3_BUCKETNAME')){
+                               bucket_name=Sys.getenv('AWS_S3_BUCKETNAME')){
   
   # Collect metadata into EML list from Metabase (using MetaEgress)
-  eml.list <- eml_egress(datasetid, mb.name, mb.cred,
+  eml_list <- eml_egress(datasetid, mb_name, mb_cred,
                          skip_checks=skip_checks)
   
   # Update the revision numbers using EDI
-  eml.list.new <- increment_edi_revision(eml.list, edi.env=edi.env)
-  rev.next <- parse_edi_pid(eml.list.new, 'revision')
+  eml_list_new <- increment_edi_revision(eml_list, edi_env=edi_env)
+  rev.next <- parse_edi_pid(eml_list_new, 'revision')
   if (rev.next>1){
     pubflag <- 'update'
   } else {
@@ -276,30 +278,106 @@ publish_dataset_edi <- function(datasetid,
   }
   
   # Validate and serialize (write) EML document
-  emlfile <- paste0(eml.list.new$packageId, ".xml")
-  eml_serialize(eml.list.new, emlfile)
+  emlfile <- paste0(eml_list_new$packageId, ".xml")
+  eml_serialize(eml_list_new, emlfile)
   
-  if (dry.run){
+  if (dry_run){
     message('Stopping because this is a dry run')
     message('Please check dataset identifiers, revision numbers, eml, etc.')
-    message('To continue to publication pass argument `dry.run=FALSE`. \n')
+    message('To continue to publication pass argument `dry_run=FALSE`. \n')
     stop("Stopping (dry run)", call.=FALSE)
   }
   
-  if (s3.upload){
+  if (s3_upload){
     # Collect the data entities from the eml list & push to s3 bucket
-    ents <- get_eml_entities(eml.list.new)
-    ents_to_s3(ents, bucket.name, multi.part=multi.part)
+    ents <- get_eml_entities(eml_list_new)
+    ents_to_s3(ents, bucket_name, multi_part=multi_part)
   } else {
     message('Skipping S3 upload: make sure data entity files are online ')
     message('at the URL designated in <distribution>. \n')
   }
   # Create or update dataset
   if (pubflag=='update'){
-    edi_update_package(emlfile, edi.cred, edi.env=edi.env)
+    edi_update_package(emlfile, edi_cred, edi_env=edi_env)
   } else {
-    edi_create_package(emlfile, edi.cred, edi.env=edi.env)
+    edi_create_package(emlfile, edi_cred, edi_env=edi_env)
   }
+}
+
+
+#' Wrapper to publish a dataset
+#'
+#' This is a basic wrapper for publishing datasets to repositories. It has
+#' some path and error handling built in. It relies on credentials and 
+#' other configurations being in one file. See the called functions
+#' 
+#'   * publish_dataset_edi()
+#'   * thats it for now...
+#' 
+#' to understand what happens...
+#'
+#' @param datasetid ID number of the dataset to find in metabase and 
+#' update in EDI
+#' @param repository name of the repository to publish to
+#' (edi.staging or edi.production)
+#' @param cred_path path to jerald credentials file (repository and metabase
+#' postgres cluster)
+#' @param data_path path to the published data directory
+#' @param dry_run boolean value - write EML only, then stop (end before s3 
+#' and EDI upload) if TRUE, continue to publish if FALSE
+#' @param s3_upload boolean value (T/F) if TRUE upload to the s3 bucket, if 
+#' FALSE skip this (entities already there). Note that this does not currently
+#' do a check on whether entities are present or not. 
+#' @export
+publish_dataset <- function(id, repository,
+                            data_path, cred_path, 
+                            dry_run=TRUE, s3_upload=TRUE){
+  # Save the current working directory
+  wd <- getwd()
+  # Now switch to the target data directory
+  setwd(data_path)
+  options(scipen=999)   # turns off scientific notation
+  # Read your jerald credentials
+  source(paste(cred_path, 'jerald_cred.R', sep='/'))
+  # Now create or update the dataset on EDI...
+  # You must pass `dry_run=FALSE` to really publish the data. Make sure to check
+  # dataset identifiers, revision numbers, eml, and other details first.
+  result <- tryCatch(
+    {
+      # Try to publish the dataset using the credentials provided
+      message('Begin publishing the dataset')
+      suppressWarnings(
+        if(repository=="edi.staging"){
+          env <- "staging"
+          publish_dataset_edi(id, mbname, mbcred, edicred, edi_env=env, dry_run=dry_run,
+            s3_upload = s3_upload)
+        } else if(repository=="edi.production"){
+          env <- "production"
+          publish_dataset_edi(id, mbname, mbcred, edicred, edi_env=env, dry_run=dry_run,
+            s3_upload = s3_upload)
+        } else {
+          message("Valid repository not specified")
+        }
+      )
+      # Return any warnings
+    }, warning = function(w){
+      message(paste("There was a warning publishing package ", id))
+      message("Here's the original warning message:")
+      message(conditionMessage(w))
+      NULL
+      # Return any errors
+    }, error = function(e){
+      message(paste("There was an error publishing package ", id))
+      message("Here's the original error message:")
+      message(conditionMessage(e))
+      NA
+      # Whatever happens, cleanup and return to original working directory
+    }, finally = {
+      # Clean up
+      remove(list=c('mbcred', 'edicred', 'mbname'), envir = .GlobalEnv)
+      setwd(wd)
+    }
+  )
 }
 
 
@@ -319,7 +397,7 @@ template_dataset_dir <- function(datasetid){
   
   # Create dataset directory name
   user.shortname <- readline(paste0('Enter a short name for the dataset: '))
-  dir.name <- paste(datasetid, user.shortname, sep='_')
+  dir_name <- paste(datasetid, user.shortname, sep='_')
   
   # Choose parent directory
   cap = 'Select a parent folder for the dataset directory'
@@ -327,7 +405,7 @@ template_dataset_dir <- function(datasetid){
   user.destdir <- tcltk::tk_choose.dir(caption=cap)
   
   # Create it
-  new.dir <- file.path(path.expand(user.destdir), dir.name)
+  new.dir <- file.path(path.expand(user.destdir), dir_name)
   message('Creating directory ', new.dir)
   if (!dir.exists(new.dir)){
     dir.create(new.dir)
@@ -406,12 +484,12 @@ template_dataset_metabase <- function(datasetid, shortname){
 #' Optionally you may remove the source dataset directory at the end but
 #' YOU SHOULD VERY CAREFULLY CHECK THE OUTPUT BEFORE ANSWERING YES! 
 #'
-#' @param eal.dir Source dataset directory, in EAL format, to migrate from
-#' @param jerald.dir Destination dataset directory, in jerald format, to
+#' @param eal_dir Source dataset directory, in EAL format, to migrate from
+#' @param jerald_dir Destination dataset directory, in jerald format, to
 #'                   migrate to
 #' @export
 #' 
-migrate_eal_dir <- function(eal.dir, jerald.dir){
+migrate_eal_dir <- function(eal_dir, jerald_dir){
   
   message('\nWARNING - this function may remove data - be careful!!!')
   user.continue <- readline('Do you want to continue? (Y/n): ')
@@ -422,99 +500,99 @@ migrate_eal_dir <- function(eal.dir, jerald.dir){
   }
   
   # Expand paths
-  eal.dir <- path.expand(eal.dir)
-  jerald.dir <- path.expand(jerald.dir)
+  eal_dir <- path.expand(eal_dir)
+  jerald_dir <- path.expand(jerald_dir)
   
   # Make sure both directories exist
-  if (!dir.exists(eal.dir)){
-    stop(eal.dir, ' does not exist.')
+  if (!dir.exists(eal_dir)){
+    stop(eal_dir, ' does not exist.')
   }
-  if (!dir.exists(jerald.dir)){
-    stop(jerald.dir, ' does not exist.\nCreate a jerald template directory',
+  if (!dir.exists(jerald_dir)){
+    stop(jerald_dir, ' does not exist.\nCreate a jerald template directory',
         ' before migrating.')
   } else {
     # If the jerald directory exists and has no EAL archive,
     # create one. If it has an EAL archive, abort.
-    eal.archive <- file.path(jerald.dir, 'EAL_archive')
-    if (!dir.exists(eal.archive)){
-      dir.create(eal.archive)
-    } else if (dir.exists(eal.archive)){
-      stop(eal.archive, '\n already exists! Aborting.')
+    eal_archive <- file.path(jerald_dir, 'EAL_archive')
+    if (!dir.exists(eal_archive)){
+      dir.create(eal_archive)
+    } else if (dir.exists(eal_archive)){
+      stop(eal_archive, '\n already exists! Aborting.')
     }
   }
   
   # List EAL directory contents
-  eal.files <- list.files(eal.dir, full.names=TRUE, include.dirs = TRUE)
+  eal_files <- list.files(eal_dir, full.names=TRUE, include.dirs = TRUE)
   # Copy all files to EAL_archive
   message('Copying all files from EAL_source to jerald_dest/EAL_archive/...')
-  file.copy(eal.files, eal.archive, recursive=TRUE, copy.date=TRUE,
+  file.copy(eal_files, eal_archive, recursive=TRUE, copy.date=TRUE,
             copy.mode=TRUE)
   message('Done.\n')
   
   # Move any data entities or warn if not found
-  eal.entities <- file.path(eal.archive, 'data_entities')
-  if (dir.exists(eal.entities)){
-    eal.dataents <- list.files(eal.entities, full.names=TRUE)
+  eal_entities <- file.path(eal_archive, 'data_entities')
+  if (dir.exists(eal_entities)){
+    eal_dataents <- list.files(eal_entities, full.names=TRUE)
     message('Move EAL data entities to parent/...')
-    file.copy(eal.dataents, jerald.dir, copy.date=TRUE, copy.mode=TRUE)
-    file.remove(eal.dataents)
+    file.copy(eal_dataents, jerald_dir, copy.date=TRUE, copy.mode=TRUE)
+    file.remove(eal_dataents)
     message('Done.\n')
   }else{
     message('Data entities directory not found!')
   }
 
   # Copy build script to top level
-  eal.buildscript <- list.files(eal.archive, pattern="(build_).*\\.R$",
+  eal_buildscript <- list.files(eal_archive, pattern="(build_).*\\.R$",
                                 full.names=TRUE)
-  print(eal.buildscript)
+  print(eal_buildscript)
   message('Move EAL build script to parent/...')
-  file.copy(eal.buildscript, file.path(jerald.dir, 'build_EALarchive.R'),
+  file.copy(eal_buildscript, file.path(jerald_dir, 'build_EALarchive.R'),
             copy.date=TRUE, copy.mode=TRUE)
-  file.remove(eal.buildscript)
+  file.remove(eal_buildscript)
   message('Done.\n')
   
   # Copy metadata files to metadata_docs/
-  eal.metadatafiles <- list.files(eal.archive,
+  eal_metadatafiles <- list.files(eal_archive,
                                   pattern="\\.(prj|dsd|his|PRJ|DSD|HIS)",
                                   full.names=TRUE, recursive=TRUE)
-  print(eal.metadatafiles)
+  print(eal_metadatafiles)
   message('Move prj, dsd, and his files to metadata_docs/...')
-  file.copy(eal.metadatafiles, file.path(jerald.dir, 'metadata_docs'),
+  file.copy(eal_metadatafiles, file.path(jerald_dir, 'metadata_docs'),
             copy.date=TRUE, copy.mode=TRUE)
-  file.remove(eal.metadatafiles)
+  file.remove(eal_metadatafiles)
   message('Done.\n')
 
   # Copy metadata templates to metadata_docs/
-  eal.metadatatemp <- list.files(eal.archive,
+  eal_metadatatemp <- list.files(eal_archive,
                                  pattern="(metadata_template).*\\.(docx|xlsx)",
                                  full.names=TRUE, recursive=TRUE)
-  print(eal.metadatatemp)
+  print(eal_metadatatemp)
   message('Move metadata_template files to metadata_docs/...')
-  file.copy(eal.metadatatemp, file.path(jerald.dir, 'metadata_docs'),
+  file.copy(eal_metadatatemp, file.path(jerald_dir, 'metadata_docs'),
             copy.date=TRUE, copy.mode=TRUE)
-  file.remove(eal.metadatatemp)
+  file.remove(eal_metadatatemp)
   message('Done.\n')
 
   # Copy other R files to parent
-  eal.rscripts <- list.files(eal.archive,pattern="\\.R$",
+  eal_rscripts <- list.files(eal_archive,pattern="\\.R$",
                              full.names=TRUE)
-  if(length(eal.rscripts > 0)){
-    print(eal.rscripts)
+  if(length(eal_rscripts > 0)){
+    print(eal_rscripts)
     message('Additional R scripts are being moved to parent/')
-    file.copy(eal.rscripts, file.path(jerald.dir),
+    file.copy(eal_rscripts, file.path(jerald_dir),
               copy.date=TRUE, copy.mode=TRUE)
-    file.remove(eal.rscripts)
+    file.remove(eal_rscripts)
     message('Done.\n')
   }
 
   # Copy EML files to eml (anything ending with .xml)
-  eal.EML <- list.files(eal.archive, pattern="\\.xml$",
+  eal_EML <- list.files(eal_archive, pattern="\\.xml$",
                         full.names=TRUE, recursive=TRUE)
-  print(eal.EML)
+  print(eal_EML)
   message('Move EML files to eml/...')
-  file.copy(eal.EML, file.path(jerald.dir, 'EML'),
+  file.copy(eal_EML, file.path(jerald_dir, 'EML'),
             copy.date=TRUE, copy.mode=TRUE)
-  file.remove(eal.EML)
+  file.remove(eal_EML)
   message('Done.\n')
   
   
@@ -522,8 +600,8 @@ migrate_eal_dir <- function(eal.dir, jerald.dir){
   user.remove <- readline(paste0('Remove the EAL_source directory? ',
                                  '(check results first!) (Y/n): '))
   if (tolower(user.continue)!='y'){
-    message('Removing ', eal.dir, ' ...')
-    unlink(eal.dir, recursive = TRUE)
+    message('Removing ', eal_dir, ' ...')
+    unlink(eal_dir, recursive = TRUE)
     message('Done.')
   }
 }

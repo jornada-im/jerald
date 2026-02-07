@@ -4,10 +4,10 @@
 \alias{insert_methodstep_md}
 \title{Insert markdown methodstep element into an EML document}
 \usage{
-insert_methodstep_md(eml.list, md_file, islist = TRUE)
+insert_methodstep_md(eml_list, md_file, islist = TRUE)
 }
 \arguments{
-\item{eml.list}{An EML-schema-formatted R list (EML R package compliant)}
+\item{eml_list}{An EML-schema-formatted R list (EML R package compliant)}
 
 \item{md_file}{A markdown methods file (full path)}
 }

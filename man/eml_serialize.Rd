@@ -4,10 +4,10 @@
 \alias{eml_serialize}
 \title{Create EML-compliant XML file from an R list}
 \usage{
-eml_serialize(eml.list, fname)
+eml_serialize(eml_list, fname)
 }
 \arguments{
-\item{eml.list}{An EML-schema-formatted R list (EML R package compliant)}
+\item{eml_list}{An EML-schema-formatted R list (EML R package compliant)}
 
 \item{fname}{Name of the EML file to create}
 }

@@ -4,16 +4,16 @@
 \alias{edi_create_package}
 \title{Create EDI repository package}
 \usage{
-edi_create_package(eml.path, edi.cred, edi.env = "staging")
+edi_create_package(eml_path, edi_cred, edi_env = "staging")
 }
 \arguments{
-\item{eml.path}{Path to an EML document for the new EDI data package
+\item{eml_path}{Path to an EML document for the new EDI data package
 Should include scope, packagid, and revision number (e.g.
 knb-lter-jrn.999.1)}
 
-\item{edi.cred}{EDI credentials in a list}
+\item{edi_cred}{EDI credentials in a list}
 
-\item{edi.env}{EDI repository environment (staging, production, or
+\item{edi_env}{EDI repository environment (staging, production, or
 development)}
 }
 \description{

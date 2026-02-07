@@ -4,10 +4,10 @@
 \alias{parse_edi_pid}
 \title{Get the EDI dataset revision number from an EML document}
 \usage{
-parse_edi_pid(eml.list, parse = "scope")
+parse_edi_pid(eml_list, parse = "scope")
 }
 \arguments{
-\item{eml.list}{R list of EML-schema-formatted metadata}
+\item{eml_list}{R list of EML-schema-formatted metadata}
 
 \item{parse}{A string designating which part of the EDI package ID to return
 ('scope', 'dataset', or 'revision')}

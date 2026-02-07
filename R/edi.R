@@ -3,14 +3,14 @@
 #' This function checks whether we are logged into EDI by looking at the
 #' "EDI_TOKEN" environment variable. If it is an empty string, log back
 #' in.
-#' @param edi.cred EDI credentials in a list
+#' @param edi_cred EDI credentials in a list
 #' @export
-edi_login <- function(edi.cred){
+edi_login <- function(edi_cred){
   message('Checking EDI login status...')
   edi_token <- Sys.getenv('EDI_TOKEN')
   if (edi_token == ''){
     message('logging in...')
-    EDIutils::login(edi.cred$user.id, edi.cred$user.pass)
+    EDIutils::login(edi_cred$user.id, edi_cred$user.pass)
   } else {
     message('already logged in...')
   }
@@ -25,30 +25,30 @@ edi_login <- function(edi.cred){
 #' have revision number 1. NOTE that if this isn't working one might need
 #' to upload EML and data at portal-s.edirepository.org
 #'
-#' @param eml.path Path to an EML document for the new EDI data package
+#' @param eml_path Path to an EML document for the new EDI data package
 #' Should include scope, packagid, and revision number (e.g. 
 #' knb-lter-jrn.999.1)
-#' @param edi.cred EDI credentials in a list
-#' @param edi.env EDI repository environment (staging, production, or 
+#' @param edi_cred EDI credentials in a list
+#' @param edi_env EDI repository environment (staging, production, or 
 #' development)
 #' @export
-edi_create_package <- function(eml.path, edi.cred, edi.env='staging'){
-  message('Sending a new EML file ', eml.path, ' to EDI ', edi.env, ' ...')
-  edi_login(edi.cred)
+edi_create_package <- function(eml_path, edi_cred, edi_env='staging'){
+  message('Sending a new EML file ', eml_path, ' to EDI ', edi_env, ' ...')
+  edi_login(edi_cred)
 	transaction <- EDIutils::create_data_package(
-    eml = eml.path, # path (with package id)
-    env = edi.env)  # EDI environment
+    eml = eml_path, # path (with package id)
+    env = edi_env)  # EDI environment
   
   # Check status of transaction
-  EDIutils::check_status_create(transaction, wait=TRUE, env=edi.env)
+  EDIutils::check_status_create(transaction, wait=TRUE, env=edi_env)
   packageid <- strsplit(transaction, '__')[[1]][2]
-  message('Created new package ', packageid, ' on EDI ', edi.env)
-  EDIutils::read_data_package_report_summary(packageid, env=edi.env)
+  message('Created new package ', packageid, ' on EDI ', edi_env)
+  EDIutils::read_data_package_report_summary(packageid, env=edi_env)
   
   message('Done.\n')
   # The above should be equivalent to:
   # api_create_data_package(path=getwd(),package.id = packageid,
-  # 			  environment = edi.env,
+  # 			  environment = edi_env,
   #   			  affiliation='EDI', user.id='<user>',
   # 			  user.pass='<password>')
 }
@@ -61,30 +61,30 @@ edi_create_package <- function(eml.path, edi.cred, edi.env='staging'){
 #' if this isn't working one might need to upload EML and data at
 #' portal-s.edirepository.org
 #'
-#' @param eml.path Path to an EML document for the EDI data package.
+#' @param eml_path Path to an EML document for the EDI data package.
 #' Should include scope, packagid, and revision number (e.g. 
 #' knb-lter-jrn.999.3)
-#' @param edi.cred EDI credentials in a list
-#' @param edi.env EDI repository environment (staging, production, or 
+#' @param edi_cred EDI credentials in a list
+#' @param edi_env EDI repository environment (staging, production, or 
 #' development)
 #' @export
-edi_update_package <- function(eml.path, edi.cred, edi.env='staging'){
-  message('Sending EML file ', eml.path, ' to EDI ', edi.env, ' for update...')
-  edi_login(edi.cred)
+edi_update_package <- function(eml_path, edi_cred, edi_env='staging'){
+  message('Sending EML file ', eml_path, ' to EDI ', edi_env, ' for update...')
+  edi_login(edi_cred)
   transaction <- EDIutils::update_data_package(
-    eml = eml.path, # path (with package id)
-    env = edi.env)  # EDI environment
+    eml = eml_path, # path (with package id)
+    env = edi_env)  # EDI environment
   
   # Check status of transaction
-  EDIutils::check_status_update(transaction, wait=TRUE, env=edi.env)
+  EDIutils::check_status_update(transaction, wait=TRUE, env=edi_env)
   packageid <- strsplit(transaction, '__')[[1]][2]
-  message('Updated package ', packageid, ' on EDI ', edi.env)
-  EDIutils::read_data_package_report_summary(packageid, env=edi.env)
+  message('Updated package ', packageid, ' on EDI ', edi_env)
+  EDIutils::read_data_package_report_summary(packageid, env=edi_env)
   
   message('Done.\n')
   # The above should be equivalent to:
   # api_update_data_package(path=getwd(),package.id = packageid,
-  # 			  environment = edi.env,
+  # 			  environment = edi_env,
   #   			  affiliation='EDI', user.id='<user>',
   # 			  user.pass='<password>')
 }
@@ -94,18 +94,18 @@ edi_update_package <- function(eml.path, edi.cred, edi.env='staging'){
 #' Any EML document created for the EDI repository should have a packageId
 #' field. Parse out the parts of that.
 #'
-#' @param eml.list R list of EML-schema-formatted metadata
+#' @param eml_list R list of EML-schema-formatted metadata
 #' @param parse A string designating which part of the EDI package ID to return
 #' ('scope', 'dataset', or 'revision')
 #' @return The requested portion of the EDI package ID 
 #' @export
-parse_edi_pid <- function(eml.list, parse='scope'){
+parse_edi_pid <- function(eml_list, parse='scope'){
   if (parse=='scope'){
-    pid <- unlist(strsplit(eml.list$packageId, ".", fixed=TRUE))[1]}
+    pid <- unlist(strsplit(eml_list$packageId, ".", fixed=TRUE))[1]}
   else if (parse=='dataset'){
-    pid <- as.numeric(unlist(strsplit(eml.list$packageId, ".", fixed=TRUE))[2])}
+    pid <- as.numeric(unlist(strsplit(eml_list$packageId, ".", fixed=TRUE))[2])}
   else if (parse=='revision'){
-    pid <- as.numeric(unlist(strsplit(eml.list$packageId, ".", fixed=TRUE))[3])}
+    pid <- as.numeric(unlist(strsplit(eml_list$packageId, ".", fixed=TRUE))[3])}
   return(pid)
 }
 
@@ -115,28 +115,28 @@ parse_edi_pid <- function(eml.list, parse='scope'){
 #' revision number for a data package there, and then updates an EML 
 #' list accordingly.
 #'
-#' @param eml.list R list of EML-schema-formatted metadata
-#' @param edi.env Name of EDI repository environment ('staging', 'production',
+#' @param eml_list R list of EML-schema-formatted metadata
+#' @param edi_env Name of EDI repository environment ('staging', 'production',
 #' or 'development')
 #' @return An EML-schema-formatted list of metadata with revised package 
 #' revision numbers.
 #' @export
-increment_edi_revision <- function(eml.list, edi.env='staging'){
+increment_edi_revision <- function(eml_list, edi_env='staging'){
   # Get the scope, packageid, and revision number
-  scope <- parse_edi_pid(eml.list, 'scope')
-  datasetid <- parse_edi_pid(eml.list, 'dataset')
-  rev.in <- parse_edi_pid(eml.list, 'revision')
+  scope <- parse_edi_pid(eml_list, 'scope')
+  datasetid <- parse_edi_pid(eml_list, 'dataset')
+  rev.in <- parse_edi_pid(eml_list, 'revision')
   
   # get the current revision number on EDI and increment by one,
   # then update in metadata list with the next revision number
   message('Checking revision number for ', datasetid, ' package in EDI ',
-          edi.env, ' and adding 1...')
+          edi_env, ' and adding 1...')
   rev.edi <- tryCatch({
     #Try to get data package revisions
     EDIutils::list_data_package_revisions(scope,
                                           datasetid,
                                           filter='newest',
-                                          env=edi.env)
+                                          env=edi_env)
   },
   error=function(cond) {
     message(paste("There is no current package with identifier ",
@@ -150,20 +150,20 @@ increment_edi_revision <- function(eml.list, edi.env='staging'){
   finally = {message('Done.\n')
   }
   )
-  rev.next <- as.numeric(rev.edi) + 1
-  message(paste("The next revision number for the package will be: ", rev.next))
+  rev_next <- as.numeric(rev.edi) + 1
+  message(paste("The next revision number for the package will be: ", rev_next))
   
   # Warn if the revisions on metabase and EDI don't match
-  if (rev.in != (rev.next-1)){
+  if (rev.in != (rev_next-1)){
     warning("The metabase revision (", rev.in, "), does not match the EDI ",
-            edi.env, " revision (", rev.next-1, ").")
+            edi_env, " revision (", rev_next-1, ").")
   }
   # Create packageID
-  id.eml.next <- paste0(scope, "." , datasetid, ".", rev.next)
-  # Create new eml.list with the new emlpkgid.next
-  eml.list.next <- eml.list
-  eml.list.next$packageId <- id.eml.next
+  id_eml_next <- paste0(scope, "." , datasetid, ".", rev_next)
+  # Create new eml_list with the new emlpkgid_next
+  eml_list_next <- eml_list
+  eml_list_next$packageId <- id_eml_next
   
   message('Done.\n')
-  return(eml.list.next)
+  return(eml_list_next)
 }

@@ -4,12 +4,12 @@
 \alias{migrate_eal_dir}
 \title{Migrate an EAL dataset directory to a jerald directory}
 \usage{
-migrate_eal_dir(eal.dir, jerald.dir)
+migrate_eal_dir(eal_dir, jerald_dir)
 }
 \arguments{
-\item{eal.dir}{Source dataset directory, in EAL format, to migrate from}
+\item{eal_dir}{Source dataset directory, in EAL format, to migrate from}
 
-\item{jerald.dir}{Destination dataset directory, in jerald format, to
+\item{jerald_dir}{Destination dataset directory, in jerald format, to
 migrate to}
 }
 \description{

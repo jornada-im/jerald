@@ -4,10 +4,10 @@
 \alias{get_eml_entities}
 \title{Get dataTable and otherEntity filenames from EML}
 \usage{
-get_eml_entities(eml.list)
+get_eml_entities(eml_list)
 }
 \arguments{
-\item{eml.list}{An EML-schema-formatted R list (EML R package compliant)}
+\item{eml_list}{An EML-schema-formatted R list (EML R package compliant)}
 }
 \value{
 A list of data entity filenames found in the EML

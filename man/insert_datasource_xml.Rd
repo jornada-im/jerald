@@ -4,10 +4,10 @@
 \alias{insert_datasource_xml}
 \title{Insert dataSource XML elements into an EML document}
 \usage{
-insert_datasource_xml(eml.list, xml_file, islist = TRUE)
+insert_datasource_xml(eml_list, xml_file, islist = TRUE)
 }
 \arguments{
-\item{eml.list}{An EML-schema-formatted R list (EML R package compliant)}
+\item{eml_list}{An EML-schema-formatted R list (EML R package compliant)}
 
 \item{xml_file}{XML file with one or more \if{html}{\out{<dataSource>}} elements (full path)}
 }

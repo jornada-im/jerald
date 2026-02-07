@@ -4,12 +4,12 @@
 \alias{increment_edi_revision}
 \title{Update EML revision numbers using EDI repository}
 \usage{
-increment_edi_revision(eml.list, edi.env = "staging")
+increment_edi_revision(eml_list, edi_env = "staging")
 }
 \arguments{
-\item{eml.list}{R list of EML-schema-formatted metadata}
+\item{eml_list}{R list of EML-schema-formatted metadata}
 
-\item{edi.env}{Name of EDI repository environment ('staging', 'production',
+\item{edi_env}{Name of EDI repository environment ('staging', 'production',
 or 'development')}
 }
 \value{
