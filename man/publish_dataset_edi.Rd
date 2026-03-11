@@ -6,7 +6,6 @@
 \usage{
 publish_dataset_edi(
   datasetid,
-  mb_name,
   mb_cred,
   edi_cred,
   edi_env = "staging",
@@ -20,8 +19,6 @@ publish_dataset_edi(
 \arguments{
 \item{datasetid}{ID number of the dataset to find in metabase and
 update in EDI}
-
-\item{mb_name}{name of the metabase database in the postgres cluster}
 
 \item{mb_cred}{list of credentials for the metabase postgres cluster}
 

@@ -26,7 +26,7 @@ metabase_connect <- function(mbcred_path) {
     
     conn <- RPostgres::dbConnect(
         drv = driver,
-        dbname = mbname,
+        dbname = mbcred$dbname,
         host = mbcred$host,
         port = mbcred$port,
         user = mbcred$user,
@@ -68,7 +68,6 @@ load_destination_cred <- function(path){
 #' @param datasetid ID number of the dataset to find in metabase and 
 #' update in EDI
 #' @param mb_cred list of credentials for the metabase postgres cluster
-#' @param mb_name name of the metabase database in the postgres cluster
 #' @param edi_cred list of credentials to use for EDI
 #' @param edi_env name of the EDI environment to update (staging, production,
 #' or development)
@@ -77,7 +76,6 @@ load_destination_cred <- function(path){
 #' @param bucket_name name of the s3 bucket to push data entities to
 #' @export
 update_dataset_edi <- function(datasetid,
-                               mb_name,
                                mb_cred,
                                edi_cred,
                                edi_env='staging',
@@ -88,23 +86,23 @@ update_dataset_edi <- function(datasetid,
                 'publish_dataset_edi instead'), immediate=T)
   
   # Collect metadata into EML list from Metabase (using MetaEgress)
-  eml_list <- eml_egress(datasetid, mb_name, mb_cred)
+  eml_list <- eml_egress(datasetid, mb_cred)
   # Revision number in metabase
-  rev.mb <- unlist(strsplit(eml_list$packageId, ".", fixed=TRUE))[3]
-  rev.mb <- as.numeric(rev.mb)
+  rev_mb <- unlist(strsplit(eml_list$packageId, ".", fixed=TRUE))[3]
+  rev_mb <- as.numeric(rev_mb)
   
   # Update the revision numbers using EDI
   eml_list_new <- increment_edi_revision(eml_list, edi_env=edi_env)
-  rev.next <- unlist(strsplit(eml_list_new$packageId, ".", fixed=TRUE))[3]
-  rev.next <- as.numeric(rev.next)
-  if (rev.next==1){
+  rev_next <- unlist(strsplit(eml_list_new$packageId, ".", fixed=TRUE))[3]
+  rev_next <- as.numeric(rev_next)
+  if (rev_next==1){
     stop("To create a new package in EDI ", edi_env, ", use the 
          `create_dataset_edi` function")
   }
   # Warn if the revisions on metabase and EDI don't match
-  #if (rev.mb!=(rev.next-1)){
-  #  warning("The metabase revision (", rev.mb, "), does not match the EDI ",
-  #          edi_env, "revision (", rev.next-1, ").")
+  #if (rev_mb!=(rev_next-1)){
+  #  warning("The metabase revision (", rev_mb, "), does not match the EDI ",
+  #          edi_env, "revision (", rev_next-1, ").")
   #}
   
   # Validate and serialize (write) EML document
@@ -152,7 +150,6 @@ update_dataset_edi <- function(datasetid,
 #' @param datasetid ID number of the dataset to find in metabase and 
 #' update in EDI
 #' @param mb_cred list of credentials for the metabase postgres cluster
-#' @param mb_name name of the metabase database in the postgres cluster
 #' @param edi_cred list of credentials to use for EDI
 #' @param edi_env name of the EDI environment to update (staging, production,
 #' or development)
@@ -161,7 +158,6 @@ update_dataset_edi <- function(datasetid,
 #' @param bucket_name name of the s3 bucket to push data entities to
 #' @export
 create_dataset_edi <- function(datasetid,
-                               mb_name,
                                mb_cred,
                                edi_cred,
                                edi_env='staging',
@@ -172,23 +168,23 @@ create_dataset_edi <- function(datasetid,
           'publish_dataset_edi instead'), immediate=T)
   
   # Collect metadata into EML list from Metabase (using MetaEgress)
-  eml_list <- eml_egress(datasetid, mb_name, mb_cred)
+  eml_list <- eml_egress(datasetid, mb_cred)
   # Revision number in metabase
-  rev.mb <- unlist(strsplit(eml_list$packageId, ".", fixed=TRUE))[3]
-  rev.mb <- as.numeric(rev.mb)
+  rev_mb <- unlist(strsplit(eml_list$packageId, ".", fixed=TRUE))[3]
+  rev_mb <- as.numeric(rev_mb)
   
   # Update the revision numbers using EDI
   eml_list_new <- increment_edi_revision(eml_list, edi_env=edi_env)
-  rev.next <- unlist(strsplit(eml_list_new$packageId, ".", fixed=TRUE))[3]
-  rev.next <- as.numeric(rev.next)
-  if (rev.next>1){
+  rev_next <- unlist(strsplit(eml_list_new$packageId, ".", fixed=TRUE))[3]
+  rev_next <- as.numeric(rev_next)
+  if (rev_next>1){
     stop("This package already exists at EDI ", edi_env, ". Use the
          `update_dataset_edi` function")
   }
   # Warn if the revisions on metabase and EDI don't match
-  #if (rev.mb != (rev.next-1)){
-  #  warning("The metabase revision (", rev.mb, "), does not match the EDI ",
-  #          edi_env, "revision (", rev.next-1, ").")
+  #if (rev_mb != (rev_next-1)){
+  #  warning("The metabase revision (", rev_mb, "), does not match the EDI ",
+  #          edi_env, "revision (", rev_next-1, ").")
   #}
   
   # Validate and serialize (write) EML document
@@ -236,7 +232,6 @@ create_dataset_edi <- function(datasetid,
 #' @param datasetid ID number of the dataset to find in metabase and 
 #' update in EDI
 #' @param mb_cred list of credentials for the metabase postgres cluster
-#' @param mb_name name of the metabase database in the postgres cluster
 #' @param edi_cred list of credentials to use for EDI
 #' @param edi_env name of the EDI environment to update (staging, production,
 #' or development)
@@ -254,7 +249,6 @@ create_dataset_edi <- function(datasetid,
 #' @param bucket_name name of the s3 bucket to push data entities to
 #' @export
 publish_dataset_edi <- function(datasetid,
-                               mb_name,
                                mb_cred,
                                edi_cred,
                                edi_env='staging',
@@ -265,13 +259,13 @@ publish_dataset_edi <- function(datasetid,
                                bucket_name=Sys.getenv('AWS_S3_BUCKETNAME')){
   
   # Collect metadata into EML list from Metabase (using MetaEgress)
-  eml_list <- eml_egress(datasetid, mb_name, mb_cred,
+  eml_list <- eml_egress(datasetid, mb_cred,
                          skip_checks=skip_checks)
   
   # Update the revision numbers using EDI
   eml_list_new <- increment_edi_revision(eml_list, edi_env=edi_env)
-  rev.next <- parse_edi_pid(eml_list_new, 'revision')
-  if (rev.next>1){
+  rev_next <- parse_edi_pid(eml_list_new, 'revision')
+  if (rev_next>1){
     pubflag <- 'update'
   } else {
     pubflag <- 'create'
@@ -318,8 +312,8 @@ publish_dataset_edi <- function(datasetid,
 #'
 #' @param datasetid ID number of the dataset to find in metabase and 
 #' update in EDI
-#' @param repository name of the repository to publish to
-#' (edi.staging or edi.production)
+#' @param repository name of the repository to publish the dataset to
+#' (current options: edi.staging, edi.production)
 #' @param cred_path path to jerald credentials file (repository and metabase
 #' postgres cluster)
 #' @param data_path path to the published data directory
@@ -349,11 +343,11 @@ publish_dataset <- function(id, repository,
       suppressWarnings(
         if(repository=="edi.staging"){
           env <- "staging"
-          publish_dataset_edi(id, mbname, mbcred, edicred, edi_env=env, dry_run=dry_run,
+          publish_dataset_edi(id, mbcred, edicred, edi_env=env, dry_run=dry_run,
             s3_upload = s3_upload)
         } else if(repository=="edi.production"){
           env <- "production"
-          publish_dataset_edi(id, mbname, mbcred, edicred, edi_env=env, dry_run=dry_run,
+          publish_dataset_edi(id, mbcred, edicred, edi_env=env, dry_run=dry_run,
             s3_upload = s3_upload)
         } else {
           message("Valid repository not specified")
@@ -374,7 +368,7 @@ publish_dataset <- function(id, repository,
       # Whatever happens, cleanup and return to original working directory
     }, finally = {
       # Clean up
-      remove(list=c('mbcred', 'edicred', 'mbname'), envir = .GlobalEnv)
+      remove(list=c('mbcred', 'edicred'), envir = .GlobalEnv)
       setwd(wd)
     }
   )

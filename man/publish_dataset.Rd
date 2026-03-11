@@ -14,8 +14,8 @@ publish_dataset(
 )
 }
 \arguments{
-\item{repository}{name of the repository to publish to
-(edi.staging or edi.production)}
+\item{repository}{name of the repository to publish the dataset to
+(current options: edi.staging, edi.production)}
 
 \item{data_path}{path to the published data directory}
 

@@ -4,34 +4,32 @@
 #' R list in the EML schema
 #'
 #' @param datasetid Number or numeric vector of dataset IDs to query
-#' @param mb_name Name of the LTER metabase to query metadata from
-#' @param mb_cred Credentials for mb_name (a list, see `load_metabase_cred`)
+#' @param mb_cred Credentials for metabase (a list, see `load_metabase_cred`)
 #' @param skip_checks Boolean value (T/F) indicating whether or not to check
 #' for congruence between data entity and attribute metadata 
 #' (check_attribute_congruence function). May want to set as True if the data
 #' are online and not in the working directory.
 #' @return An EML-schema-formatted list of metadata (EML R package compliant)
 #' @export
-eml_egress <- function(datasetid, mb_name, mb_cred,
+eml_egress <- function(datasetid, mb_cred,
                        skip_checks=FALSE){
   # Get metadata (list of dataframes) from metabase
   message('MetaEgress is collecting metadata for ', datasetid, ' from LTER ',
-          'Metabase ', mb_name, '...')
+          'Metabase ', mb_cred$dbname, '...')
   metadata <- do.call(MetaEgress::get_meta, 
-                      c(list(dbname = mb_name,
-                             dataset_ids = c(datasetid)),
+                      c(list(dataset_ids = c(datasetid)),
                         mb_cred)) # assigned in cred file
   # Create a nested list of dataTables and otherEntities formatted for the
   # EML document
   message('Generating entity table...')
-  entity.list <- MetaEgress::create_entity_all(meta_list =  metadata,
+  entity_list <- MetaEgress::create_entity_all(meta_list =  metadata,
                                             file_dir = getwd(),
                                             dataset_id = datasetid,
                                             skip_checks = skip_checks)
   # Create an EML schema list object (nested list)
   message('Creating EML schema list...')
   eml_list <- MetaEgress::create_EML(meta_list = metadata,
-                                     entity_list = entity.list,
+                                     entity_list = entity_list,
                                      dataset_id = datasetid,
                                      expand_taxa = TRUE,
                                      skip_taxa = FALSE)
@@ -68,21 +66,21 @@ eml_serialize <- function(eml_list, fname){
 #' @export
 get_eml_entities <- function(eml_list){
   # Get dataTable filenames from EML
-  entityname.list <- c()
+  entityname_list <- c()
   if (length(eml_list$dataset$dataTable) > 0){
     for (i in 1:length(eml_list$dataset$dataTable)){
-      entityname.list <- append(entityname.list,
+      entityname_list <- append(entityname_list,
 			eml_list$dataset$dataTable[[i]]$physical$objectName)
     }
   }
   # Also add other entities
   if (length(eml_list$dataset$otherEntity) > 0){
     for (i in 1:length(eml_list$dataset$otherEntity)){
-      entityname.list <- append(entityname.list,
+      entityname_list <- append(entityname_list,
 			eml_list$dataset$otherEntity[[i]]$physical$objectName)
     }
   }
-  return(entityname.list)
+  return(entityname_list)
 }
 
 #' Insert markdown methodstep element into an EML document

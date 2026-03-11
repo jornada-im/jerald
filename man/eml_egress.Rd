@@ -4,14 +4,12 @@
 \alias{eml_egress}
 \title{Create EML list from an LTER metabase using MetaEgress}
 \usage{
-eml_egress(datasetid, mb_name, mb_cred, skip_checks = FALSE)
+eml_egress(datasetid, mb_cred, skip_checks = FALSE)
 }
 \arguments{
 \item{datasetid}{Number or numeric vector of dataset IDs to query}
 
-\item{mb_name}{Name of the LTER metabase to query metadata from}
-
-\item{mb_cred}{Credentials for mb_name (a list, see \code{load_metabase_cred})}
+\item{mb_cred}{Credentials for metabase (a list, see \code{load_metabase_cred})}
 
 \item{skip_checks}{Boolean value (T/F) indicating whether or not to check
 for congruence between data entity and attribute metadata

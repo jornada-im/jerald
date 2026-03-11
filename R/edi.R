@@ -125,13 +125,13 @@ increment_edi_revision <- function(eml_list, edi_env='staging'){
   # Get the scope, packageid, and revision number
   scope <- parse_edi_pid(eml_list, 'scope')
   datasetid <- parse_edi_pid(eml_list, 'dataset')
-  rev.in <- parse_edi_pid(eml_list, 'revision')
+  rev_in <- parse_edi_pid(eml_list, 'revision')
   
   # get the current revision number on EDI and increment by one,
   # then update in metadata list with the next revision number
   message('Checking revision number for ', datasetid, ' package in EDI ',
           edi_env, ' and adding 1...')
-  rev.edi <- tryCatch({
+  rev_edi <- tryCatch({
     #Try to get data package revisions
     EDIutils::list_data_package_revisions(scope,
                                           datasetid,
@@ -150,12 +150,12 @@ increment_edi_revision <- function(eml_list, edi_env='staging'){
   finally = {message('Done.\n')
   }
   )
-  rev_next <- as.numeric(rev.edi) + 1
+  rev_next <- as.numeric(rev_edi) + 1
   message(paste("The next revision number for the package will be: ", rev_next))
   
   # Warn if the revisions on metabase and EDI don't match
-  if (rev.in != (rev_next-1)){
-    warning("The metabase revision (", rev.in, "), does not match the EDI ",
+  if (rev_in != (rev_next-1)){
+    warning("The metabase revision (", rev_in, "), does not match the EDI ",
             edi_env, " revision (", rev_next-1, ").")
   }
   # Create packageID
