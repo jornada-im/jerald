@@ -1,7 +1,8 @@
-# This .Renviron contains secrets for the JRN IM team's EDI, Metabase, and S3
-# bucket accounts. Edit carefully and place in project/session directory.
-# usethis::edit_r_environ("project") opens .Renviron for editing.
-# Restart R after making changes.
+# This **example** .Renviron contains secrets for the JRN IM team's EDI, Metabase,
+# and S3 bucket accounts. Add the variables below to an .Renviron at the 
+# current project (projectname/.Renviron) or global user ($HOME/.Renviron)
+# level. usethis::edit_r_environ("user|project") opens an .Renviron for 
+# editing in one of those places. Restart R after making changes.
 
 ## Local path to Field Crew/IM SharePoint directory (Documents_Jornada-FC-IM)
 JORNADA_ROOT=/path/to/Documents_Jornada-FC-IM

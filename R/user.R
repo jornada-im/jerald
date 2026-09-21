@@ -124,10 +124,17 @@ publish_dataset_edi <- function(datasetid,
 #' and EDI upload) if TRUE, continue to publish if FALSE
 #' @param s3_upload boolean value (T/F) if TRUE upload to the s3 bucket, if 
 #' FALSE skip this (entities already there). Note that this does not currently
-#' do a check on whether entities are present or not. 
+#' do a check on whether entities are present or not.
+#' @param multi_part boolean value (T/F) if TRUE upload to the s3 bucket using
+#' multipart method
+#' @param skip_checks boolean value (T/F) indicating whether or not to check
+#' for congruence between data entity and attribute metadata 
+#' (check_attribute_congruence function). May want to set as True if the data
+#' are online and not in the working directory.
 #' @export
 publish_dataset <- function(datasetid, repository, data_path,
-                            dry_run=TRUE, s3_upload=TRUE){
+                            dry_run=TRUE, s3_upload=TRUE,
+                            multi_part=FALSE, skip_checks=FALSE){
   # Save the current working directory
   wd <- getwd()
   # Now switch to the target data directory
@@ -144,11 +151,11 @@ publish_dataset <- function(datasetid, repository, data_path,
         if(repository=="edi.staging"){
           env <- "staging"
           publish_dataset_edi(datasetid, edi_env=env, dry_run=dry_run,
-            s3_upload = s3_upload)
+            s3_upload=s3_upload, multi_part=multi_part, skip_checks=skip_checks)
         } else if(repository=="edi.production"){
           env <- "production"
           publish_dataset_edi(datasetid, edi_env=env, dry_run=dry_run,
-            s3_upload = s3_upload)
+            s3_upload=s3_upload, multi_part=multi_part, skip_checks=skip_checks)
         } else {
           message("Valid repository not specified")
         }

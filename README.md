@@ -24,13 +24,23 @@ In some cases you might want the development version, but be careful and talk to
 
 The dependencies listed above should be pulled in at install time if you don't already have them.
 
-Once `jerald` is installed you will need to make credentials for accessing the metadata database and the necessary web resources, which include a data repository (usually EDI) and an s3 bucket. You do this with an `.Renviron` file, and you should ask your lead IM or administrator for help with this.
+### Setting up credentials
+
+Once `jerald` is installed you will need to make credentials available for accessing the metadata database and the necessary web resources, which include a data repository (usually EDI) and an s3 bucket. You do this with an `.Renviron` file that is read at R startup and adds credentials to your session environment. See the [`.Renviron.template`](inst/template/.Renviron.template) file for an example of the proper format. Your `.Renviron` can live at either the project level (`<project name>/.Renviron`) or user level (in your home directory: `$HOME/.Renviron`) and should contain credentials for:
+
+1. A "Metabase", or metadata database, running on PostgreSQL. 
+2. An S3 bucket at a cloud provider. Currently we use DigitalOcean and the [`aws.s3`](https://github.com/cloudyr/aws.s3) client R package.
+3. A repository to publish to. Currently we use [EDI](https://edirepository.org) and authenticate via an API key (described [here](https://edirepository.org/user-guides/iam)).
+
+To get started, copy the template (`.Renviron.template`) to your project or home directory. You can also use `usethis::edit_r_environ("user|project")` to open (or edit) an `.Renviron` in one of those places. Once template values are there you will need to contact your lead IM or administrator for the correct credentials to fill in. Always restart R after making changes.
 
 ## IM tasks and relevant jerald functions
 
 `jerald` has several user-facing functions, described below, that will help accomplish most data management and publication tasks performed by information managers at the Jornada. A template script that uses these functions to update an example dataset (id=999) on EDI is provided when making a new dataset directory using the instructions below, or is available at `inst/template/build_eml.999.R`. This script gives a demonstration of a basic Jornada workflow.
 
 ### Create a new dataset directory or migrate an older one
+
+**NOTE: These methods are a little out of date at the moment!**
 
 `jerald` includes a number of templates (see `inst/template/`) for setting up a data management project directory and scripts. To create a new dataset directory and populate with recommended files and subdirectories, run:
 
@@ -50,36 +60,7 @@ where `eal.dir` is the path to the EAL directory, and `jerald.dir` is the path t
 
 **NOTE:** More recently for the Jornada, these dataset build scripts are being developed and stored in the `juntar` repositories in our GitHub organization (there are several).
 
-### Metabase and repository credentials
-
-To make EML and publish data, `jerald` needs credentials for several systems, including the database instance with a metabase, an S3 bucket (optional), and the repository. These credentials need to be placed in your `.Renviron` file so that the credentials are loaded to the your R session environment. An example for providing these credentials can be found in the [`.Renviron.template`](inst/template/.Renviron.template) file.
-
-### Update or create a dataset on EDI (old way)
-
-There are several user functions for publishing data to EDI. The first step is to load credentials for your Metabase and web resources:
-
-    load_metabase_cred(mbcred_path)
-
-    load_destination_cred(destcred_path)
-
-where `mb.pathname` is the path to a Metabase credentials file and `dest.path` is the directory path containing a `jerald_destination_keys.R` file. Again, your lead IM or system administrator can provide templates for the Metabase credentials file, and will likely set up the destination credentials file for you.
-
-Once the credentials have been loaded you can create and upload datasets at EDI (or possibly other repositories in the future...). To publish a dataset to EDI use:
-
-    publish_dataset_edi(datasetid, mb_cred, edi_cred)
-
-where `datasetid` is the unique identifier for the dataset in your Metabase and EDI; `mb_cred` is a list of credentials for Metabase and is returned by `load_metabase_cred`; `edi_cred` is a list of credentials for EDI and is returned by `load_destination_cred`. For safety, the default arguments for this function will either do a "dry-run" of the process (no update to EDI), or will update the data package at the EDI "staging" repository. You can change both behaviors using the `edi_env` and `dry_run` arguments once you are sure you are ready to publish. 
-
-Make sure to check revision numbers, dataset id, and other details before setting `dry_run=FALSE`. If the dataset is new to EDI repository it should be created with revision number 1, and if it is an update the dataset will be published with a revision number incremented by 1 from what is already present at EDI. Note that a dataset is called a data package in EDI terms.
-
-#### Useful options for `publish_dataset_edi()`
-
-* `dry_run` controls whether publication completes or is a dry run (as explained above). `TRUE` by default.
-* `s3_upload` controls whether the data entities will be pushed to the s3 bucket (`TRUE` by default). If the entities already exist at the URL specified in the EML this may be set to `FALSE`. Note that file identities (md5 hashes) are not checked.
-* `multi_part` controls whether data entities are pushed to the s3 bucket with a multi-part upload (`FALSE` by default). This is useful for large files, and required beyond a certain filesize threshold.
-* `skip_checks` controls whether congruence between attribute metadata and data files is checked (`FALSE` by default). When the data are not locally present, for example when they are hosted at ezEML, this can be set to `TRUE` to avoid a missing file error. Make sure congruence has been checked in the remote location first.
-
-### Update or create a dataset (new)
+### Update or create a dataset
 
 To publish a dataset in a repository the `publish_dataset` function wraps up most of the functionality in jerald. You provide a datasetid, the destination repository (currently only EDI supported), and the path to the data entities. 
 
@@ -89,6 +70,12 @@ To publish a dataset in a repository the `publish_dataset` function wraps up mos
 
 * `dry_run` controls whether publication completes or is a dry run (as explained above). `TRUE` by default.
 * `s3_upload` controls whether the data entities will be pushed to the s3 bucket (`TRUE` by default). If the entities already exist at the URL specified in the EML this may be set to `FALSE`. Note that file identities (md5 hashes) are not checked.
+* `multi_part` controls whether data entities are pushed to the s3 bucket with a multi-part upload (`FALSE` by default). This is useful for large files, and required beyond a certain filesize threshold.
+* `skip_checks` controls whether congruence between attribute metadata and data files is checked (`FALSE` by default). When the data are not locally present, for example when they are hosted at ezEML, this can be set to `TRUE` to avoid a missing file error. Make sure congruence has been checked in the remote location first.
+
+### EML to metabase (Meta-ingress)
+
+Working on this!
 
 ## Other functions
 
