@@ -9,7 +9,9 @@ publish_dataset(
   repository,
   data_path,
   dry_run = TRUE,
-  s3_upload = TRUE
+  s3_upload = TRUE,
+  multi_part = FALSE,
+  skip_checks = FALSE
 )
 }
 \arguments{
@@ -27,6 +29,14 @@ and EDI upload) if TRUE, continue to publish if FALSE}
 \item{s3_upload}{boolean value (T/F) if TRUE upload to the s3 bucket, if
 FALSE skip this (entities already there). Note that this does not currently
 do a check on whether entities are present or not.}
+
+\item{multi_part}{boolean value (T/F) if TRUE upload to the s3 bucket using
+multipart method}
+
+\item{skip_checks}{boolean value (T/F) indicating whether or not to check
+for congruence between data entity and attribute metadata
+(check_attribute_congruence function). May want to set as True if the data
+are online and not in the working directory.}
 }
 \description{
 This is a basic wrapper for publishing datasets to repositories. It has

@@ -1,4 +1,7 @@
-# Get EDI credentials
+#' Get EDI credentials
+#'
+#' Exposes the EDI credentials object
+#'
 #' @export
 get_edicred <- function() {
   get("edicred", envir = asNamespace("jerald"))
@@ -9,7 +12,6 @@ get_edicred <- function() {
 #' This function checks whether we are logged into EDI by looking at the
 #' "EDI_TOKEN" environment variable. If it is an empty string, log back
 #' in.
-#' @param edi_cred EDI credentials in a list
 #' @export
 edi_login <- function(){
   message('Checking EDI login status...')

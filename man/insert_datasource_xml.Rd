@@ -10,6 +10,8 @@ insert_datasource_xml(eml_list, xml_file, islist = TRUE)
 \item{eml_list}{An EML-schema-formatted R list (EML R package compliant)}
 
 \item{xml_file}{XML file with one or more \if{html}{\out{<dataSource>}} elements (full path)}
+
+\item{islist}{Boolean value indicating whether the methodstep is in a list}
 }
 \value{
 An updated EML-schema-formatted R list (EML R package compliant)

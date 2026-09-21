@@ -34,6 +34,8 @@ Once `jerald` is installed you will need to make credentials available for acces
 
 To get started, copy the template (`.Renviron.template`) to your project or home directory. You can also use `usethis::edit_r_environ("user|project")` to open (or edit) an `.Renviron` in one of those places. Once template values are there you will need to contact your lead IM or administrator for the correct credentials to fill in. Always restart R after making changes.
 
+**IMPORTANT NOTE**: At the current time, EDI does not support API keys that work in both staging and production environments. You will need to supply one or the other in your `.Renviron` and switch between them (and restart R) to publish to staging, then production EDI. Toggling line comments in the file is an easy-enough way to do this.
+
 ## IM tasks and relevant jerald functions
 
 `jerald` has several user-facing functions, described below, that will help accomplish most data management and publication tasks performed by information managers at the Jornada. A template script that uses these functions to update an example dataset (id=999) on EDI is provided when making a new dataset directory using the instructions below, or is available at `inst/template/build_eml.999.R`. This script gives a demonstration of a basic Jornada workflow.
@@ -80,3 +82,13 @@ Working on this!
 ## Other functions
 
 There are some lower-level functions that might occasionally be useful... (will document these later)
+
+## GenAI disclosure
+
+Generative AI has been used in parts of this repository for tasks including:
+
+- Idea generation
+- Development of experimental or research protocols
+- Code optimization
+
+The GAI tool used was: Claude Sonnet and Opus >= 4.6.

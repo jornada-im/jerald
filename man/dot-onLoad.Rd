@@ -2,10 +2,21 @@
 % Please edit documentation in R/zzz.R
 \name{.onLoad}
 \alias{.onLoad}
-\title{On load of the package do this stuff}
+\title{Set the environment when jerald is loaded}
 \usage{
 .onLoad(libname, pkgname)
 }
+\arguments{
+\item{libname}{library name - automatically set}
+
+\item{pkgname}{name of the package (jerald)}
+}
 \description{
-On load of the package do this stuff
+This "hook" will execute whenever 'jerald' is loaded or attached and
+create objects accessible in the jerald namespace. Mainly these are
+secret things like credentials and host addresses that users don't need
+direct access to during a session, but functions do. These are not
+exported, but there are some public functions that will expose edicred
+and mbcred if asked. More at the
+\href{https://r-pkgs.org/code.html#sec-code-onLoad-onAttach}{R package book}.
 }

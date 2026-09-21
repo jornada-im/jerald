@@ -18,6 +18,8 @@ format_DataSet(
 
 \item{eml}{An emld object derived from an EML file}
 
+\item{revnum}{revision number of dataset}
+
 \item{outpath}{The path to output an abstract markdown file to. Defaults to
 current working directory}
 

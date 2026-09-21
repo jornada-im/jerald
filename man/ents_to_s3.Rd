@@ -9,7 +9,10 @@ ents_to_s3(ents, bucket_name, multi_part = FALSE)
 \arguments{
 \item{ents}{A list of dataTable or otherEntity filenames}
 
-\item{bucketname}{Name of the s3 bucket to upload to}
+\item{bucket_name}{Name of the s3 bucket to upload to}
+
+\item{multi_part}{Boolean value (T/F) if TRUE upload to the s3 bucket using
+multipart method}
 }
 \description{
 This function takes a list of data entities and uploads them to an s3

@@ -6,6 +6,7 @@
 #'
 #' @param dsid The dataset id value, which is the primary key for lter_metabase
 #' @param eml An emld object derived from an EML file
+#' @param revnum revision number of dataset
 #' @param outpath The path to output an abstract markdown file to. Defaults to
 #' current working directory
 #' @param boilerplate_id The identifier of a "boilerplate" record in metabase,
@@ -23,7 +24,7 @@ format_DataSet <- function(dsid, eml,
     print(eml$dataset$abstract$para[[i]])
     lines[[i]] <- eml$dataset$abstract$para[[i]]
   }
-  outfile = paste0("abstract.", dsid, ".ingress.md")
+  outfile <- paste0("abstract.", dsid, ".ingress.md")
   fileConn<-file(paste0(outpath, "/", outfile))
   message(paste0("Writing ", paste0(outpath, "/", outfile)))
   writeLines(lines, fileConn)
@@ -310,16 +311,16 @@ format_DataSetAttributes <- function(dsid, eml){
                     NumberType = if("numberType" %in% colnames(.)) numberType else NA,
                     BoundsMinimum = if("minimum" %in% colnames(.)) minimum else NA, 
                     BoundsMaximum = if("maximum" %in% colnames(.)) maximum else NA) %>%
-      dplyr::select(DataSetID, EntitySortOrder, ColumnPosition,
-                    ColumnName = attributeName,
-                    AttributeID, AttributeLabel,
-                    Description = attributeDefinition,
-                    StorageType = storageType,
-                    MeasurementScaleDomainID,
-                    DateTimeFormatString, DateTimePrecision,
-                    TextPatternDefinition, Unit,
-                    NumericPrecision, NumberType,
-                    BoundsMinimum, BoundsMaximum)
+      dplyr::select("DataSetID", "EntitySortOrder", "ColumnPosition",
+                    "ColumnName" = "attributeName",
+                    "AttributeID", "AttributeLabel",
+                    "Description" = "attributeDefinition",
+                    "StorageType" = "storageType",
+                    "MeasurementScaleDomainID",
+                    "DateTimeFormatString", "DateTimePrecision",
+                    "TextPatternDefinition", "Unit",
+                    "NumericPrecision", "NumberType",
+                    "BoundsMinimum", "BoundsMaximum")
     # Add the metabase formatted table to the list
     att_tbls[[i]] <- att_i
 
@@ -328,16 +329,16 @@ format_DataSetAttributes <- function(dsid, eml){
       dplyr::filter(!is.na(missingValueCodeExplanation)) %>%
       dplyr::mutate(DataSetID = dsid,
                     EntitySortOrder = i) %>%
-      dplyr::select(DataSetID, EntitySortOrder, ColumnName=attributeName,
-                    MissingValueCodeID=missingValueCode)
+      dplyr::select("DataSetID", "EntitySortOrder", "ColumnName"="attributeName",
+                    "MissingValueCodeID"="missingValueCode")
     missval_tbls[[i]] <- miss_i
 
     # 3. Format enumeration table for metabase (DataSetAttributeEnumeration)
     enum_i <- attList$factors %>% 
       dplyr::mutate(DataSetID = dsid,
                     EntitySortOrder = i) %>%
-      dplyr::select(DataSetID, EntitySortOrder,ColumnName=attributeName,
-                    CodeID=code)
+      dplyr::select("DataSetID", "EntitySortOrder","ColumnName"="attributeName",
+                    "CodeID"="code")
     # Add the metabase formatted table to the list
     attenum_tbls[[i]] <- enum_i
 
@@ -346,7 +347,7 @@ format_DataSetAttributes <- function(dsid, eml){
     # First get categorical codes from "factors" table
     code1_i <- attList$factors %>% 
       dplyr::mutate(CodeID = paste("emlCode", code, sep="_")) %>%
-      dplyr::select(CodeID, Code=code, CodeExplanation=definition)
+      dplyr::select("CodeID", "Code"="code", "CodeExplanation"="definition")
 
     # Then missing codes from attributes table
     code2_i <- attList$attributes %>% 
@@ -354,7 +355,7 @@ format_DataSetAttributes <- function(dsid, eml){
       dplyr::mutate(CodeID = paste("emlMiss", missingValueCode, sep="_"),
                     Code = missingValueCode,
                     CodeExplanation = missingValueCodeExplanation) %>%
-      dplyr::select(CodeID, Code, CodeExplanation)
+      dplyr::select("CodeID", "Code", "CodeExplanation")
 
     # Concatenate categorical and missing codes
     code_i <- do.call(rbind, list(code1_i, code2_i))
@@ -380,7 +381,7 @@ format_DataSetAttributes <- function(dsid, eml){
 #'
 #' @param dsid The dataset id value, which is the primary key for lter_metabase
 #' @param df A dataframe object or list of dataframes
-#' @param enum_cols A vector of column names that are categorical
+#' @param enumcols_df A dataframe of column names that are categorical
 #' @return A named list containing four dataframes formatted to match the 
 #' lter_metabase."DataSetAttributes", lter_metabase."ListCodes",
 #' lter_metabase."DataSetAttributeEnumeration", and
@@ -453,14 +454,14 @@ format_DataSetAttributes_df <- function(dsid, df, enumcols_df = NULL){
                         MeasurementScaleDomainID == "ratio" ~ "real"),
                     BoundsMinimum = NA, 
                     BoundsMaximum = NA) %>%
-      dplyr::select(DataSetID, EntitySortOrder, ColumnPosition,
-                    ColumnName = attributeName,
-                    AttributeID, AttributeLabel, Description,
-                    StorageType, MeasurementScaleDomainID,
-                    DateTimeFormatString, DateTimePrecision,
-                    TextPatternDefinition, Unit,
-                    NumericPrecision, NumberType,
-                    BoundsMinimum, BoundsMaximum)
+      dplyr::select("DataSetID", "EntitySortOrder", "ColumnPosition",
+                    "ColumnName" = "attributeName",
+                    "AttributeID", "AttributeLabel", "Description",
+                    "StorageType", "MeasurementScaleDomainID",
+                    "DateTimeFormatString", "DateTimePrecision",
+                    "TextPatternDefinition", "Unit",
+                    "NumericPrecision", "NumberType",
+                    "BoundsMinimum", "BoundsMaximum")
     # Add the metabase formatted table to the list
     att_tbls[[i]] <- att_i
 
@@ -471,8 +472,8 @@ format_DataSetAttributes_df <- function(dsid, df, enumcols_df = NULL){
       dplyr::mutate(DataSetID = dsid,
                     EntitySortOrder = i,
                     MissingValueCodeID = "dfMiss_NA") %>%
-      dplyr::select(DataSetID, EntitySortOrder, ColumnName=attributeName,
-                    MissingValueCodeID)
+      dplyr::select("DataSetID", "EntitySortOrder", "ColumnName"="attributeName",
+                    "MissingValueCodeID")
     missval_tbls[[i]] <- miss_i
 
     # 3. Format enumeration table for metabase (DataSetAttributeEnumeration)
@@ -484,7 +485,7 @@ format_DataSetAttributes_df <- function(dsid, df, enumcols_df = NULL){
                           values_to = "CodeID") %>%
       dplyr::mutate(CodeID = paste("dfCode", CodeID, sep="_")) %>%
       unique() %>% dplyr::mutate(DataSetID = dsid, EntitySortOrder = i) %>%
-      dplyr::select(DataSetID, EntitySortOrder,ColumnName, CodeID)
+      dplyr::select("DataSetID", "EntitySortOrder","ColumnName", "CodeID")
     # Add the metabase formatted table to the list
     attenum_tbls[[i]] <- enum_i
 
@@ -494,14 +495,14 @@ format_DataSetAttributes_df <- function(dsid, df, enumcols_df = NULL){
     code1_i <- attenum_tbls[[i]] %>%
       dplyr::mutate(Code = stringr::str_replace(CodeID, "dfCode_", ""),
                     CodeExplanation = paste("Explanation for enumerated code ", CodeID, sep=" ")) %>%
-      dplyr::select(CodeID, Code, CodeExplanation)
+      dplyr::select("CodeID", "Code", "CodeExplanation")
 
     # Then missing codes from attributes table
     code2_i <- missval_tbls[[i]] %>% 
       dplyr::mutate(Code = "NA",
                     CodeExplanation = paste("Explanation for missing code ",
                     MissingValueCodeID, sep=" ")) %>%
-      dplyr::select(CodeID=MissingValueCodeID, Code, CodeExplanation)
+      dplyr::select("CodeID"="MissingValueCodeID", "Code", "CodeExplanation")
 
     # Concatenate categorical and missing codes
     code_i <- do.call(rbind, list(code1_i, code2_i))
@@ -554,10 +555,10 @@ format_DataSetKeywords <- function(dsid, eml){
     if(is.list(df$keyword)){
       # If no keywordType attributes unnest a 1 element keyword list
       if(length(df$keyword[[1]])==1){
-        df <- tidyr::unnest(df, cols=c(keyword))
+        df <- tidyr::unnest(df, cols=c("keyword"))
       # With keywordType attributes we have 2 element lists to unnest
       } else if(length(df$keyword[[1]])>1){
-        df <- tidyr::unnest_wider(df, keyword)
+        df <- tidyr::unnest_wider(df, "keyword")
         }
     }
     # Add keywordType column if missing
@@ -571,22 +572,22 @@ format_DataSetKeywords <- function(dsid, eml){
 
   # Replace missing and common thesaurus values with metabase equivalents
   df1 <- df1 %>%  
-    dplyr::mutate(Keyword = if_else(is.na(keyword), "NA", keyword),
-      ThesaurusID = if_else(is.na(keywordThesaurus), "none", keywordThesaurus),
+    dplyr::mutate(Keyword = dplyr::if_else(is.na(.data$keyword), "NA", .data$keyword),
+      ThesaurusID = dplyr::if_else(is.na(.data$keywordThesaurus), "none", .data$keywordThesaurus),
       ThesaurusID = gsub("\\(No thesaurus\\)", "none", ThesaurusID),
-      ThesaurusID = if_else(grepl("lter core", tolower(ThesaurusID)),
+      ThesaurusID = dplyr::if_else(grepl("lter core", tolower(ThesaurusID)),
                                   "lter_cv_cra", ThesaurusID),
-      ThesaurusID = if_else(grepl("lter controlled", tolower(ThesaurusID)),
+      ThesaurusID = dplyr::if_else(grepl("lter controlled", tolower(ThesaurusID)),
                                   "lter_cv", ThesaurusID)
     )
   # Reformat to get the DataSetKeywords table
   dskws <- df1 %>%
     dplyr::mutate(DataSetID = dsid) %>%
-    dplyr::select(DataSetID, Keyword, ThesaurusID)
+    dplyr::select("DataSetID", "Keyword", "ThesaurusID")
   # Reformat for ListKeywords table
   lkws <- df1 %>% 
     dplyr::mutate(KeywordType = ifelse(is.na(keywordType), "theme", keywordType)) %>%
-    dplyr::select(Keyword, ThesaurusID, KeywordType)
+    dplyr::select("Keyword", "ThesaurusID", "KeywordType")
 
   # Return a named list
   return(list("DataSetKeywords" = dskws, "ListKeywords" = lkws))
@@ -877,8 +878,6 @@ return_if_node_exists <- function(qlist, nodeid=1){
 #' This helps standardize EML element types into lists for iteration
 #'
 #' @param qlist An EML list address to query
-#' @param nodeid Name (char) or index (int) of the element to check existence of
-#' and return if present in qlist
 #' @return NULL if qlist is NULL (doesn't exist), qlist if it is an unnamed list
 #' (list of element types), and list(qlist) if it contains named elements 
 #' (single, unlisted element type).

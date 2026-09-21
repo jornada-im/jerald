@@ -11,7 +11,7 @@ format_DataSetAttributes_df(dsid, df, enumcols_df = NULL)
 
 \item{df}{A dataframe object or list of dataframes}
 
-\item{enum_cols}{A vector of column names that are categorical}
+\item{enumcols_df}{A dataframe of column names that are categorical}
 }
 \value{
 A named list containing four dataframes formatted to match the

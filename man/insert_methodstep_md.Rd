@@ -10,6 +10,8 @@ insert_methodstep_md(eml_list, md_file, islist = TRUE)
 \item{eml_list}{An EML-schema-formatted R list (EML R package compliant)}
 
 \item{md_file}{A markdown methods file (full path)}
+
+\item{islist}{Boolean value indicating whether the methodstep is in a list}
 }
 \value{
 An updated EML-schema-formatted R list (EML R package compliant)

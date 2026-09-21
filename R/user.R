@@ -135,52 +135,49 @@ publish_dataset_edi <- function(datasetid,
 publish_dataset <- function(datasetid, repository, data_path,
                             dry_run=TRUE, s3_upload=TRUE,
                             multi_part=FALSE, skip_checks=FALSE){
-  # Save the current working directory
-  wd <- getwd()
-  # Now switch to the target data directory
-  setwd(data_path)
-  options(scipen=999)   # turns off scientific notation
+  # Check args
+  if (!dir.exists(data_path)) {
+    stop("data_path does not exist: ", data_path, call. = FALSE)
+  }
   # Now create or update the dataset on EDI...
   # You must pass `dry_run=FALSE` to really publish the data. Make sure to check
   # dataset identifiers, revision numbers, eml, and other details first.
-  result <- tryCatch(
-    {
-      # Try to publish the dataset using the credentials provided
-      message('Begin publishing the dataset')
-      suppressWarnings(
-        if(repository=="edi.staging"){
-          env <- "staging"
-          publish_dataset_edi(datasetid, edi_env=env, dry_run=dry_run,
-            s3_upload=s3_upload, multi_part=multi_part, skip_checks=skip_checks)
-        } else if(repository=="edi.production"){
-          env <- "production"
-          publish_dataset_edi(datasetid, edi_env=env, dry_run=dry_run,
-            s3_upload=s3_upload, multi_part=multi_part, skip_checks=skip_checks)
-        } else {
-          message("Valid repository not specified")
-        }
-      )
-      # Return any warnings
-    }, warning = function(w){
-      message(paste("There was a warning publishing package ", datasetid))
-      message("Here's the original warning message:")
-      message(conditionMessage(w))
-      NULL
-      # Return any errors
-    }, error = function(e){
-      message(paste("There was an error publishing package ", datasetid))
-      message("Here's the original error message:")
-      message(conditionMessage(e))
-      NA
-      # Whatever happens, cleanup and return to original working directory
-    }, finally = {
-      # Clean up
-      #remove(list=c('mbcred', 'edicred'), envir = .GlobalEnv)
-      setwd(wd)
-    }
-  )
-}
+    withr::with_dir(data_path, {
 
+    result <- tryCatch(
+      {
+        # Try to publish the dataset using the credentials provided
+        message('Begin publishing the dataset')
+        suppressWarnings(
+          if (repository == "edi.staging") {
+            publish_dataset_edi(datasetid, edi_env = "staging", dry_run = dry_run,
+                                 s3_upload = s3_upload, multi_part = multi_part,
+                                 skip_checks = skip_checks)
+          } else if (repository == "edi.production") {
+            publish_dataset_edi(datasetid, edi_env = "production", dry_run = dry_run,
+                                 s3_upload = s3_upload, multi_part = multi_part,
+                                 skip_checks = skip_checks)
+          } else {
+            message("Valid repository not specified")
+          }
+        )
+      },
+      # Return any warnings
+      warning = function(w) {
+        message(paste("There was a warning publishing package ", datasetid))
+        message(conditionMessage(w))
+        NULL
+      },
+      # Return any errors
+      error = function(e) {
+        message(paste("There was an error publishing package ", datasetid))
+        message(conditionMessage(e))
+        NA
+      }
+    )
+  })
+  result
+}
 
 #' Create a dataset directory from a jerald template
 #'

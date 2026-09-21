@@ -16,5 +16,6 @@ Imports:
     aws.s3,
     EDIutils,
     magrittr,
-    MetaEgress
+    MetaEgress,
+    withr
 Config/roxygen2/version: 8.0.0

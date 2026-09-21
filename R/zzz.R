@@ -1,4 +1,16 @@
-#' On load of the package do this stuff
+#' Set the environment when jerald is loaded
+#' 
+#' This "hook" will execute whenever 'jerald' is loaded or attached and 
+#' create objects accessible in the jerald namespace. Mainly these are 
+#' secret things like credentials and host addresses that users don't need
+#' direct access to during a session, but functions do. These are not 
+#' exported, but there are some public functions that will expose edicred
+#' and mbcred if asked. More at the
+#' [R package book](https://r-pkgs.org/code.html#sec-code-onLoad-onAttach).
+#'
+#' @param libname library name - automatically set
+#' @param pkgname name of the package (jerald)
+#'
 .onLoad <- function(libname, pkgname){
   ns <- asNamespace(pkgname)
   # Create the edicred list of EDI credentials

@@ -6,9 +6,6 @@
 \usage{
 edi_login()
 }
-\arguments{
-\item{edi_cred}{EDI credentials in a list}
-}
 \description{
 This function checks whether we are logged into EDI by looking at the
 "EDI_TOKEN" environment variable. If it is an empty string, log back

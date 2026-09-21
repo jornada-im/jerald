@@ -1,4 +1,7 @@
-# Get Metabase credentials
+#' Get Metabase credentials
+#'
+#' Exposes the Metabase credentials object
+#'
 #' @export
 get_mbcred <- function() {
   get("mbcred", envir = asNamespace("jerald"))
@@ -97,6 +100,7 @@ get_eml_entities <- function(eml_list){
 #' 
 #' @param eml_list An EML-schema-formatted R list (EML R package compliant)
 #' @param md_file A markdown methods file (full path)
+#' @param islist Boolean value indicating whether the methodstep is in a list
 #' @return An updated EML-schema-formatted R list (EML R package compliant)
 #' @export
 insert_methodstep_md <- function(eml_list, md_file, islist=TRUE){
@@ -121,6 +125,7 @@ insert_methodstep_md <- function(eml_list, md_file, islist=TRUE){
 #' 
 #' @param eml_list An EML-schema-formatted R list (EML R package compliant)
 #' @param xml_file XML file with one or more <dataSource> elements (full path)
+#' @param islist Boolean value indicating whether the methodstep is in a list
 #' @return An updated EML-schema-formatted R list (EML R package compliant)
 #' @export
 insert_datasource_xml <- function(eml_list, xml_file, islist=TRUE){

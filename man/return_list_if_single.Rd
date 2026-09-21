@@ -8,9 +8,6 @@ return_list_if_single(qlist)
 }
 \arguments{
 \item{qlist}{An EML list address to query}
-
-\item{nodeid}{Name (char) or index (int) of the element to check existence of
-and return if present in qlist}
 }
 \value{
 NULL if qlist is NULL (doesn't exist), qlist if it is an unnamed list

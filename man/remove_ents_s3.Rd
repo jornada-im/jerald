@@ -9,7 +9,7 @@ remove_ents_s3(ents, bucket_name)
 \arguments{
 \item{ents}{A list of dataTable or otherEntity filenames in an s3 bucket}
 
-\item{bucketname}{Name of the s3 bucket to modify}
+\item{bucket_name}{Name of the s3 bucket to modify}
 }
 \description{
 This function takes a list of data entities and deletes them from an s3

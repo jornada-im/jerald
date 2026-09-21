@@ -4,7 +4,9 @@
 #' bucket
 #'
 #' @param ents A list of dataTable or otherEntity filenames
-#' @param bucketname Name of the s3 bucket to upload to
+#' @param bucket_name Name of the s3 bucket to upload to
+#' @param multi_part Boolean value (T/F) if TRUE upload to the s3 bucket using
+#' multipart method
 #' @export
 ents_to_s3 <- function(ents, bucket_name, multi_part=FALSE){
   for (fname in ents) {
@@ -23,7 +25,7 @@ message('Done.\n')
 #' bucket
 #'
 #' @param ents A list of dataTable or otherEntity filenames in an s3 bucket
-#' @param bucketname Name of the s3 bucket to modify
+#' @param bucket_name Name of the s3 bucket to modify
 #' @export
 remove_ents_s3 <- function(ents, bucket_name){
   for (fname in ents) {
