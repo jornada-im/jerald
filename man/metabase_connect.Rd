@@ -2,16 +2,15 @@
 % Please edit documentation in R/user.R
 \name{metabase_connect}
 \alias{metabase_connect}
-\title{Connect to an LTER Metabase}
+\title{Connect to an LTER Metabase
+DEPRECATE?}
 \usage{
-metabase_connect(mbcred_path)
-}
-\arguments{
-\item{mbcred_path}{Path to a file containing credentials for an LTER Metabase instance}
+metabase_connect()
 }
 \value{
 A connection to the LTER Metabase
 }
 \description{
 Connect to an LTER Metabase
+DEPRECATE?
 }

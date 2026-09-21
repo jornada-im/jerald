@@ -1,3 +1,9 @@
+# Get Metabase credentials
+#' @export
+get_mbcred <- function() {
+  get("mbcred", envir = asNamespace("jerald"))
+}
+
 #' Create EML list from an LTER metabase using MetaEgress
 #'
 #' This function queries an LTER metabase and formats the metadata into an

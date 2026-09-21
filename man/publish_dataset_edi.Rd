@@ -6,8 +6,6 @@
 \usage{
 publish_dataset_edi(
   datasetid,
-  mb_cred,
-  edi_cred,
   edi_env = "staging",
   dry_run = TRUE,
   s3_upload = TRUE,
@@ -19,10 +17,6 @@ publish_dataset_edi(
 \arguments{
 \item{datasetid}{ID number of the dataset to find in metabase and
 update in EDI}
-
-\item{mb_cred}{list of credentials for the metabase postgres cluster}
-
-\item{edi_cred}{list of credentials to use for EDI}
 
 \item{edi_env}{name of the EDI environment to update (staging, production,
 or development)}

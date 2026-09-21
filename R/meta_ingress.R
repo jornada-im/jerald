@@ -549,15 +549,15 @@ suggest_ListCodes <- function(from_eml, from_metabase){
 format_DataSetKeywords <- function(dsid, eml){
   # Take the KeywordSet list and form into a rough dataframe
   for(i in 1:length(eml$dataset$keywordSet)){
-    df <- as_tibble(eml$dataset$keywordSet[[i]])
+    df <- dplyr::as_tibble(eml$dataset$keywordSet[[i]])
     # If keywordset has >1 element the keyword column is a list ()
     if(is.list(df$keyword)){
       # If no keywordType attributes unnest a 1 element keyword list
       if(length(df$keyword[[1]])==1){
-        df <- unnest(df, cols=c(keyword))
+        df <- tidyr::unnest(df, cols=c(keyword))
       # With keywordType attributes we have 2 element lists to unnest
       } else if(length(df$keyword[[1]])>1){
-        df <- unnest_wider(df, keyword)
+        df <- tidyr::unnest_wider(df, keyword)
         }
     }
     # Add keywordType column if missing
@@ -854,14 +854,14 @@ return_if_node_exists <- function(qlist, nodeid=1){
     val = NA
   }
   # If present return a named (character) element in qlist, or NA if not present
-  else if (class(nodeid)=="character"){
+  else if (inherits(class(nodeid), "character")){
     if (exists(nodeid, where=qlist)) {
       val = qlist[[nodeid]]
     } else {
       val = NA
     }
   # Return an indexed element in qlist, or NA if not present (first is default)
-  } else if (class(nodeid)=="numeric"){
+  } else if (inherits(class(nodeid), "numeric")){
     if (length(qlist) >= nodeid){
       val = qlist[[nodeid]]
     } else {

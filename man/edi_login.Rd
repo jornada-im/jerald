@@ -4,7 +4,7 @@
 \alias{edi_login}
 \title{Check EDI login status}
 \usage{
-edi_login(edi_cred)
+edi_login()
 }
 \arguments{
 \item{edi_cred}{EDI credentials in a list}

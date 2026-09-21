@@ -1,3 +1,9 @@
+# Get EDI credentials
+#' @export
+get_edicred <- function() {
+  get("edicred", envir = asNamespace("jerald"))
+}
+
 #' Check EDI login status
 #'
 #' This function checks whether we are logged into EDI by looking at the
@@ -5,12 +11,17 @@
 #' in.
 #' @param edi_cred EDI credentials in a list
 #' @export
-edi_login <- function(edi_cred){
+edi_login <- function(){
   message('Checking EDI login status...')
   edi_token <- Sys.getenv('EDI_TOKEN')
-  if (edi_token == ''){
+  if (edi_token == ""){
     message('logging in...')
-    EDIutils::login(edi_cred$user.id, edi_cred$user.pass)
+    if (edicred$key == ""){
+      message('No EDI access key given, try username/password...')
+      EDIutils::login(userId=edicred$user, userPass=edicred$password)
+    } else {
+      EDIutils::login(key=edicred$key)
+    }
   } else {
     message('already logged in...')
   }
@@ -28,13 +39,11 @@ edi_login <- function(edi_cred){
 #' @param eml_path Path to an EML document for the new EDI data package
 #' Should include scope, packagid, and revision number (e.g. 
 #' knb-lter-jrn.999.1)
-#' @param edi_cred EDI credentials in a list
 #' @param edi_env EDI repository environment (staging, production, or 
 #' development)
 #' @export
-edi_create_package <- function(eml_path, edi_cred, edi_env='staging'){
+edi_create_package <- function(eml_path, edi_env='staging'){
   message('Sending a new EML file ', eml_path, ' to EDI ', edi_env, ' ...')
-  edi_login(edi_cred)
 	transaction <- EDIutils::create_data_package(
     eml = eml_path, # path (with package id)
     env = edi_env)  # EDI environment
@@ -64,13 +73,11 @@ edi_create_package <- function(eml_path, edi_cred, edi_env='staging'){
 #' @param eml_path Path to an EML document for the EDI data package.
 #' Should include scope, packagid, and revision number (e.g. 
 #' knb-lter-jrn.999.3)
-#' @param edi_cred EDI credentials in a list
 #' @param edi_env EDI repository environment (staging, production, or 
 #' development)
 #' @export
-edi_update_package <- function(eml_path, edi_cred, edi_env='staging'){
+edi_update_package <- function(eml_path, edi_env='staging'){
   message('Sending EML file ', eml_path, ' to EDI ', edi_env, ' for update...')
-  edi_login(edi_cred)
   transaction <- EDIutils::update_data_package(
     eml = eml_path, # path (with package id)
     env = edi_env)  # EDI environment

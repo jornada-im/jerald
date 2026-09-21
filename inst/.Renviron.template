@@ -1,0 +1,46 @@
+# This .Renviron contains secrets for the JRN IM team's EDI, Metabase, and S3
+# bucket accounts. Edit carefully and place in project/session directory.
+# usethis::edit_r_environ("project") opens .Renviron for editing.
+# Restart R after making changes.
+
+## Local path to Field Crew/IM SharePoint directory (Documents_Jornada-FC-IM)
+JORNADA_ROOT=/path/to/Documents_Jornada-FC-IM
+
+## EDI credentials
+# Set value of an API access key, which can be obtained after login at
+# https://auth.edirepository.org. Or auth-s for staging
+# EDI_API_KEY=abcd1234
+# For staging
+EDI_API_KEY=abcd1234
+# If you don't have an API key you can use a username/password
+# EDI user name
+EDI_USER_NAME=<name>
+# EDI user password
+EDI_USER_PASS=<password>
+
+## JRN_Metabase credentials - assigned by database administrator
+# Name of database
+METABASE_NAME=<db name>
+# Host address
+METABASE_HOST=<host ip or domain>
+# Port number at host (usually 5432)
+METABASE_PORT=5432
+# Metabase user (login role) name
+METABASE_USER==<name>
+# Metabase user password
+METABASE_PASSWORD=<password>
+
+## If using S3, place credentials obtained from S3 storage provider (AWS or
+## other) here.
+# S3 host address
+AWS_S3_ENDPOINT=<url>
+# S3 bucket name, optional subpath
+AWS_S3_BUCKETNAME=<bucketname & optional path>
+# S3 access key
+AWS_ACCESS_KEY_ID=abcd1234
+# S3 secret acces key
+AWS_SECRET_ACCESS_KEY=abcd1234
+# Provider region/datacenter, eg us-west3
+AWS_DEFAULT_REGION=<region>
+# Usually ok to leave blank
+AWS_SESSION_TOKEN= ""

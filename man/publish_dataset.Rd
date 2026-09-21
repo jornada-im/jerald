@@ -5,22 +5,21 @@
 \title{Wrapper to publish a dataset}
 \usage{
 publish_dataset(
-  id,
+  datasetid,
   repository,
   data_path,
-  cred_path,
   dry_run = TRUE,
   s3_upload = TRUE
 )
 }
 \arguments{
+\item{datasetid}{ID number of the dataset to find in metabase and
+update in EDI}
+
 \item{repository}{name of the repository to publish the dataset to
 (current options: edi.staging, edi.production)}
 
 \item{data_path}{path to the published data directory}
-
-\item{cred_path}{path to jerald credentials file (repository and metabase
-postgres cluster)}
 
 \item{dry_run}{boolean value - write EML only, then stop (end before s3
 and EDI upload) if TRUE, continue to publish if FALSE}
@@ -28,9 +27,6 @@ and EDI upload) if TRUE, continue to publish if FALSE}
 \item{s3_upload}{boolean value (T/F) if TRUE upload to the s3 bucket, if
 FALSE skip this (entities already there). Note that this does not currently
 do a check on whether entities are present or not.}
-
-\item{datasetid}{ID number of the dataset to find in metabase and
-update in EDI}
 }
 \description{
 This is a basic wrapper for publishing datasets to repositories. It has

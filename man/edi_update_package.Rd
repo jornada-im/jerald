@@ -4,14 +4,12 @@
 \alias{edi_update_package}
 \title{Update EDI repository package}
 \usage{
-edi_update_package(eml_path, edi_cred, edi_env = "staging")
+edi_update_package(eml_path, edi_env = "staging")
 }
 \arguments{
 \item{eml_path}{Path to an EML document for the EDI data package.
 Should include scope, packagid, and revision number (e.g.
 knb-lter-jrn.999.3)}
-
-\item{edi_cred}{EDI credentials in a list}
 
 \item{edi_env}{EDI repository environment (staging, production, or
 development)}

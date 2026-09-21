@@ -24,7 +24,7 @@ In some cases you might want the development version, but be careful and talk to
 
 The dependencies listed above should be pulled in at install time if you don't already have them.
 
-Once `jerald` is installed you will need to direct it to stored credentials for accessing the metadata database and the necessary web resources, which include a data repository (usually EDI) and an s3 bucket. Ask your lead IM or administrator for help with this.
+Once `jerald` is installed you will need to make credentials for accessing the metadata database and the necessary web resources, which include a data repository (usually EDI) and an s3 bucket. You do this with an `.Renviron` file, and you should ask your lead IM or administrator for help with this.
 
 ## IM tasks and relevant jerald functions
 
@@ -52,7 +52,7 @@ where `eal.dir` is the path to the EAL directory, and `jerald.dir` is the path t
 
 ### Metabase and repository credentials
 
-To make EML and publish data, `jerald` needs credentials for several systems, including the database instance with a metabase, an S3 bucket (optional), and the repository. A template file for providing these credentials is in the [templates folder of this repository](inst/template/jerald_cred_template.R).
+To make EML and publish data, `jerald` needs credentials for several systems, including the database instance with a metabase, an S3 bucket (optional), and the repository. These credentials need to be placed in your `.Renviron` file so that the credentials are loaded to the your R session environment. An example for providing these credentials can be found in the [`.Renviron.template`](inst/template/.Renviron.template) file.
 
 ### Update or create a dataset on EDI (old way)
 
@@ -81,15 +81,14 @@ Make sure to check revision numbers, dataset id, and other details before settin
 
 ### Update or create a dataset (new)
 
-To publish a dataset in a repository the `publish_dataset` function wraps up most of the functionality in jerald. You provide a datasetid, the destination repository (currently only EDI supported), the path to the data entities, and the path to your jerald credentials file. 
+To publish a dataset in a repository the `publish_dataset` function wraps up most of the functionality in jerald. You provide a datasetid, the destination repository (currently only EDI supported), and the path to the data entities. 
 
-    publish_dataset(datasetid, "edi.staging", "./path/to/data", "./path/to/jerald_cred.R", )
+    publish_dataset(datasetid, "edi.staging", "./path/to/data" )
 
 #### Supported options
 
 * `dry_run` controls whether publication completes or is a dry run (as explained above). `TRUE` by default.
 * `s3_upload` controls whether the data entities will be pushed to the s3 bucket (`TRUE` by default). If the entities already exist at the URL specified in the EML this may be set to `FALSE`. Note that file identities (md5 hashes) are not checked.
-
 
 ## Other functions
 

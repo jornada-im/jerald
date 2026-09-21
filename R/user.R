@@ -1,25 +1,9 @@
-#' Get LTER Metabase credentials
-#'
-#' This function reads credentials for an LTER Metabase into the mbcred
-#' list variable.
-#'
-#' @param pathname Complete path (including filename) to your metabase
-#' credentials
-#' @return mbcred - a list containing metabase credentials
-#' @export
-load_metabase_cred <- function(pathname){
-  # Source the file
-  source(pathname)
-}
-
 #' Connect to an LTER Metabase
+#' DEPRECATE?
 #'
-#' @param mbcred_path Path to a file containing credentials for an LTER Metabase instance
 #' @return A connection to the LTER Metabase
 #' @export
-metabase_connect <- function(mbcred_path) {
-    # Get metabase credentials (includes host, port, user, pwd, and dbname)
-    load_metabase_cred(mbcred_path)
+metabase_connect <- function() {
 
     # Get postgres driver and connect to the metabase
     driver <- RPostgres::Postgres()
@@ -33,182 +17,6 @@ metabase_connect <- function(mbcred_path) {
         password = mbcred$password)
         
     return(conn)
-}
-
-#' Get dataset destination credentials
-#'
-#' This function reads credentials for any data repositories and s3 buckets
-#' in a jerald destination credentials file.
-#'
-#' @param path Path to the 'destination_keys.R' file containing API keys
-#' @return edicred - a list containing EDI credentials
-#' @export
-load_destination_cred <- function(path){
-  # Source the file
-  source(paste0(path, 'jerald_destination_keys.R'))
-}
-
-#' Update a dataset at the EDI repository
-#'
-#' This function updates an existing dataset (or "data package") at the EDI
-#' research data repository using metadata derived from an LTER Metabase. 
-#' The user must supply credentials for the metabase and EDI (see 
-#' `load_metabase_cred` and `load_destination_cred` functions), and
-#' appropriate database and EDI environment names.
-#' 
-#' The basic process is to
-#' 
-#' 1. Pull metadata for the dataset from the metabase using `MetaEgress`
-#' 2. Query for the current dataset revision in the EDI environment
-#' 3. Write an EML document for the next revision to go to EDI
-#' 4. Push EML data entities from the working directory to an s3 bucket
-#' 5. Push the EML document to EDI, which triggers PASTA to pull data from
-#'    the s3 bucket and update the data package.
-#'
-#' @param datasetid ID number of the dataset to find in metabase and 
-#' update in EDI
-#' @param mb_cred list of credentials for the metabase postgres cluster
-#' @param edi_cred list of credentials to use for EDI
-#' @param edi_env name of the EDI environment to update (staging, production,
-#' or development)
-#' @param publish boolean value - publish if TRUE, end before s3 upload if 
-#' FALSE
-#' @param bucket_name name of the s3 bucket to push data entities to
-#' @export
-update_dataset_edi <- function(datasetid,
-                               mb_cred,
-                               edi_cred,
-                               edi_env='staging',
-                               publish=FALSE,
-                               bucket_name=Sys.getenv('AWS_S3_BUCKETNAME')){
-  warning(paste('This function (update_dataset_edi) is now deprecated and will', 
-                'be removed from a future version of jerald. Use',
-                'publish_dataset_edi instead'), immediate=T)
-  
-  # Collect metadata into EML list from Metabase (using MetaEgress)
-  eml_list <- eml_egress(datasetid, mb_cred)
-  # Revision number in metabase
-  rev_mb <- unlist(strsplit(eml_list$packageId, ".", fixed=TRUE))[3]
-  rev_mb <- as.numeric(rev_mb)
-  
-  # Update the revision numbers using EDI
-  eml_list_new <- increment_edi_revision(eml_list, edi_env=edi_env)
-  rev_next <- unlist(strsplit(eml_list_new$packageId, ".", fixed=TRUE))[3]
-  rev_next <- as.numeric(rev_next)
-  if (rev_next==1){
-    stop("To create a new package in EDI ", edi_env, ", use the 
-         `create_dataset_edi` function")
-  }
-  # Warn if the revisions on metabase and EDI don't match
-  #if (rev_mb!=(rev_next-1)){
-  #  warning("The metabase revision (", rev_mb, "), does not match the EDI ",
-  #          edi_env, "revision (", rev_next-1, ").")
-  #}
-  
-  # Validate and serialize (write) EML document
-  message('Validating EML...')
-  out <- EML::eml_validate(eml_list_new)
-  message(out)
-  message('Writing EML...')
-  emlfile <- paste0(eml_list_new$packageId, ".xml")
-  EML::write_eml(eml_list_new, file=emlfile)
-  message('Done.\n')
-  
-  if (!publish){
-    message('Stopping execution: the dataset will not be published')
-    message('Please check dataset identifiers, revision numbers, eml, etc.')
-    message('To continue to publication pass argument `publish=TRUE`. \n')
-    stop("Stopping", call.=FALSE)
-  }
-  
-  # Collect the data entities from the eml list & push to s3 bucket
-  ents <- get_eml_entities(eml_list_new)
-  ents_to_s3(ents, bucket_name)
-  
-  # Update package on EDI
-  edi_update_package(emlfile, edi_cred, edi_env=edi_env)
-}
-
-
-#' Create a dataset at the EDI repository
-#'
-#' This function creates a new dataset (or "data package") at the EDI
-#' research data repository using metadata derived from an LTER Metabase. 
-#' The user must supply credentials for the metabase and EDI (see 
-#' `load_metabase_cred` and `load_destination_cred` functions), and
-#' appropriate database and EDI environment names.
-#' 
-#' The basic process is to
-#' 
-#' 1. Pull metadata for the dataset from the metabase using `MetaEgress`
-#' 2. Query for the current dataset revision in the EDI environment
-#' 3. Write an EML document for the next revision to go to EDI
-#' 4. Push EML data entities from the working directory to an s3 bucket
-#' 5. Push the EML document to EDI, which triggers PASTA to pull data from
-#'    the s3 bucket and update the data package.
-#'
-#' @param datasetid ID number of the dataset to find in metabase and 
-#' update in EDI
-#' @param mb_cred list of credentials for the metabase postgres cluster
-#' @param edi_cred list of credentials to use for EDI
-#' @param edi_env name of the EDI environment to update (staging, production,
-#' or development)
-#' @param publish boolean value - publish if TRUE, end before s3 upload if 
-#' FALSE
-#' @param bucket_name name of the s3 bucket to push data entities to
-#' @export
-create_dataset_edi <- function(datasetid,
-                               mb_cred,
-                               edi_cred,
-                               edi_env='staging',
-                               publish=FALSE,
-                               bucket_name=Sys.getenv('AWS_S3_BUCKETNAME')){
-  warning(paste('This function (create_dataset_edi) is now deprecated and will', 
-          'be removed from a future version of jerald. Use',
-          'publish_dataset_edi instead'), immediate=T)
-  
-  # Collect metadata into EML list from Metabase (using MetaEgress)
-  eml_list <- eml_egress(datasetid, mb_cred)
-  # Revision number in metabase
-  rev_mb <- unlist(strsplit(eml_list$packageId, ".", fixed=TRUE))[3]
-  rev_mb <- as.numeric(rev_mb)
-  
-  # Update the revision numbers using EDI
-  eml_list_new <- increment_edi_revision(eml_list, edi_env=edi_env)
-  rev_next <- unlist(strsplit(eml_list_new$packageId, ".", fixed=TRUE))[3]
-  rev_next <- as.numeric(rev_next)
-  if (rev_next>1){
-    stop("This package already exists at EDI ", edi_env, ". Use the
-         `update_dataset_edi` function")
-  }
-  # Warn if the revisions on metabase and EDI don't match
-  #if (rev_mb != (rev_next-1)){
-  #  warning("The metabase revision (", rev_mb, "), does not match the EDI ",
-  #          edi_env, "revision (", rev_next-1, ").")
-  #}
-  
-  # Validate and serialize (write) EML document
-  message('Validating EML...')
-  out <- EML::eml_validate(eml_list_new)
-  message(out)
-  message('Writing EML...')
-  emlfile <- paste0(eml_list_new$packageId, ".xml")
-  EML::write_eml(eml_list_new, file=emlfile)
-  message('Done.\n')
-  
-  if (!publish){
-    message('Stopping execution: the dataset will not be published')
-    message('Please check dataset identifiers, revision numbers, eml, etc.')
-    message('To continue to publication pass argument `publish=TRUE`. \n')
-    stop("Stopping", call.=FALSE)
-  }
-  
-  # Collect the data entities from the eml list & push to s3 bucket
-  ents <- get_eml_entities(eml_list_new)
-  ents_to_s3(ents, bucket_name)
-  
-  # Update package on EDI
-  edi_create_package(emlfile, edi_cred, edi_env=edi_env)
 }
 
 
@@ -231,8 +39,6 @@ create_dataset_edi <- function(datasetid,
 #'
 #' @param datasetid ID number of the dataset to find in metabase and 
 #' update in EDI
-#' @param mb_cred list of credentials for the metabase postgres cluster
-#' @param edi_cred list of credentials to use for EDI
 #' @param edi_env name of the EDI environment to update (staging, production,
 #' or development)
 #' @param dry_run boolean value - write EML only, then stop (end before s3 
@@ -249,8 +55,6 @@ create_dataset_edi <- function(datasetid,
 #' @param bucket_name name of the s3 bucket to push data entities to
 #' @export
 publish_dataset_edi <- function(datasetid,
-                               mb_cred,
-                               edi_cred,
                                edi_env='staging',
                                dry_run=TRUE,
                                s3_upload=TRUE,
@@ -259,9 +63,10 @@ publish_dataset_edi <- function(datasetid,
                                bucket_name=Sys.getenv('AWS_S3_BUCKETNAME')){
   
   # Collect metadata into EML list from Metabase (using MetaEgress)
-  eml_list <- eml_egress(datasetid, mb_cred,
+  eml_list <- eml_egress(datasetid, mbcred,
                          skip_checks=skip_checks)
-  
+  # Login to EDI (sets EDI_TOKEN if needed)
+  edi_login()
   # Update the revision numbers using EDI
   eml_list_new <- increment_edi_revision(eml_list, edi_env=edi_env)
   rev_next <- parse_edi_pid(eml_list_new, 'revision')
@@ -292,9 +97,9 @@ publish_dataset_edi <- function(datasetid,
   }
   # Create or update dataset
   if (pubflag=='update'){
-    edi_update_package(emlfile, edi_cred, edi_env=edi_env)
+    edi_update_package(emlfile, edi_env=edi_env)
   } else {
-    edi_create_package(emlfile, edi_cred, edi_env=edi_env)
+    edi_create_package(emlfile, edi_env=edi_env)
   }
 }
 
@@ -314,8 +119,6 @@ publish_dataset_edi <- function(datasetid,
 #' update in EDI
 #' @param repository name of the repository to publish the dataset to
 #' (current options: edi.staging, edi.production)
-#' @param cred_path path to jerald credentials file (repository and metabase
-#' postgres cluster)
 #' @param data_path path to the published data directory
 #' @param dry_run boolean value - write EML only, then stop (end before s3 
 #' and EDI upload) if TRUE, continue to publish if FALSE
@@ -323,16 +126,13 @@ publish_dataset_edi <- function(datasetid,
 #' FALSE skip this (entities already there). Note that this does not currently
 #' do a check on whether entities are present or not. 
 #' @export
-publish_dataset <- function(id, repository,
-                            data_path, cred_path, 
+publish_dataset <- function(datasetid, repository, data_path,
                             dry_run=TRUE, s3_upload=TRUE){
   # Save the current working directory
   wd <- getwd()
   # Now switch to the target data directory
   setwd(data_path)
   options(scipen=999)   # turns off scientific notation
-  # Read your jerald credentials
-  source(paste(cred_path, 'jerald_cred.R', sep='/'))
   # Now create or update the dataset on EDI...
   # You must pass `dry_run=FALSE` to really publish the data. Make sure to check
   # dataset identifiers, revision numbers, eml, and other details first.
@@ -343,11 +143,11 @@ publish_dataset <- function(id, repository,
       suppressWarnings(
         if(repository=="edi.staging"){
           env <- "staging"
-          publish_dataset_edi(id, mbcred, edicred, edi_env=env, dry_run=dry_run,
+          publish_dataset_edi(datasetid, edi_env=env, dry_run=dry_run,
             s3_upload = s3_upload)
         } else if(repository=="edi.production"){
           env <- "production"
-          publish_dataset_edi(id, mbcred, edicred, edi_env=env, dry_run=dry_run,
+          publish_dataset_edi(datasetid, edi_env=env, dry_run=dry_run,
             s3_upload = s3_upload)
         } else {
           message("Valid repository not specified")
@@ -355,20 +155,20 @@ publish_dataset <- function(id, repository,
       )
       # Return any warnings
     }, warning = function(w){
-      message(paste("There was a warning publishing package ", id))
+      message(paste("There was a warning publishing package ", datasetid))
       message("Here's the original warning message:")
       message(conditionMessage(w))
       NULL
       # Return any errors
     }, error = function(e){
-      message(paste("There was an error publishing package ", id))
+      message(paste("There was an error publishing package ", datasetid))
       message("Here's the original error message:")
       message(conditionMessage(e))
       NA
       # Whatever happens, cleanup and return to original working directory
     }, finally = {
       # Clean up
-      remove(list=c('mbcred', 'edicred'), envir = .GlobalEnv)
+      #remove(list=c('mbcred', 'edicred'), envir = .GlobalEnv)
       setwd(wd)
     }
   )
