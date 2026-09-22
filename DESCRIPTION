@@ -12,10 +12,14 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-Imports: 
+Imports:
     aws.s3,
+    DBI,
     EDIutils,
     magrittr,
     MetaEgress,
+    RPostgres,
+    stats,
+    utils,
     withr
 Config/roxygen2/version: 8.0.0

@@ -77,7 +77,63 @@ To publish a dataset in a repository the `publish_dataset` function wraps up mos
 
 ### EML to metabase (Meta-ingress)
 
-Working on this!
+Meta-ingress is the reverse of publication: it takes an existing EML document
+and creates the Metabase records that would generate it. This is how a dataset
+that was described somewhere else (ezEML, EMLassemblyline, or a package already
+at EDI) gets brought under Metabase management.
+
+    eml_to_metabase("knb-lter-jrn.210001001.5.xml")
+
+By default this is a **dry run**. Nothing is written to the database. Instead,
+`eml_to_metabase` reads the EML, formats it into Metabase tables, checks those
+tables against the live Metabase schema, and writes to the working directory:
+
+* `abstract.<id>.ingress.md` and `methods.<id>.ingress.md` — the text that
+  the new `DataSet` and `DataSetMethod` rows refer to.
+* `metabase.<table>.<id>.csv` — one file per formatted table, in the order
+  they would be inserted. Empty cells are NULLs.
+* `ingress.<id>.log.md` — the log.
+
+**Read the log before going any further.** EML and the Metabase schema do not
+line up neatly, so the log is where the workflow tells you what it did and what
+it could not do. Entries are grouped under four headings:
+
+* `problem` — Metabase will reject this. Values that are too long for their
+  column, missing values in NOT NULL columns, and values outside a controlled
+  vocabulary (units, storage types, keyword thesauri, maintenance frequency).
+  Fix these first.
+* `gap` — metadata in the EML that did not make it into Metabase, such as
+  taxonomic coverage, annotations, or `otherEntity` attributes.
+* `decision` — a default the workflow chose for you, or a duplicate row it
+  dropped. Sites named `unknown1`, `unknown2`, …; entities assumed to be
+  `csv_B`; a person who is both creator and contact recorded once.
+* `info` — progress and row counts.
+
+Once the log is clean, pass `dry_run=FALSE` to write to Metabase:
+
+    eml_to_metabase("knb-lter-jrn.210001001.5.xml", dry_run=FALSE)
+
+All tables are inserted in one transaction, so a failure part way through
+leaves Metabase unchanged rather than leaving a half-described dataset behind.
+
+Two rules are worth knowing about:
+
+1. **Existing datasets are refused.** If the dataset ID is already in
+   `DataSet`, `eml_to_metabase` stops. Revising a dataset already in Metabase
+   is a manual job.
+2. **The shared vocabularies win.** People, keywords, sites, and codes already
+   in the `List*` tables are never overwritten. Those rows are skipped and
+   logged so you can check them against the EML yourself.
+
+#### Supported options
+
+* `dsid` and `revision` are read from the EML `packageId` unless you pass them.
+* `outpath` sets where the CSVs, log, and metadata files are written
+  (working directory by default).
+* `boilerplate_id` names the `mb2eml_r.boilerplate` record supplying the
+  project tree, publisher, and intellectual rights (`jrn-default` by default).
+* `conn` takes an open Metabase connection if you already have one; otherwise
+  `metabase_connect()` opens and closes one.
 
 ## Other functions
 
