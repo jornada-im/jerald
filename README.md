@@ -26,7 +26,7 @@ The dependencies listed above should be pulled in at install time if you don't a
 
 ### Setting up credentials
 
-Once `jerald` is installed you will need to make credentials available for accessing the metadata database and the necessary web resources, which include a data repository (usually EDI) and an s3 bucket. You do this with an `.Renviron` file that is read at R startup and adds credentials to your session environment. See the [`.Renviron.template`](inst/template/.Renviron.template) file for an example of the proper format. Your `.Renviron` can live at either the project level (`<project name>/.Renviron`) or user level (in your home directory: `$HOME/.Renviron`) and should contain credentials for:
+Once `jerald` is installed you will need to make credentials available for accessing the metadata database and the necessary web resources, which include a data repository (usually EDI) and an s3 bucket. You do this with an `.Renviron` file that is read at R startup and adds credentials to your session environment. See the [`.Renviron.template`](inst/.Renviron.template) file for an example of the proper format. Your `.Renviron` can live at either the project level (`<project name>/.Renviron`) or user level (in your home directory: `$HOME/.Renviron`) and should contain credentials for:
 
 1. A "Metabase", or metadata database, running on PostgreSQL. 
 2. An S3 bucket at a cloud provider. Currently we use DigitalOcean and the [`aws.s3`](https://github.com/cloudyr/aws.s3) client R package.
