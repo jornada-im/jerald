@@ -148,11 +148,11 @@ increment_edi_revision <- function(eml_list, edi_env='staging'){
                                           env=edi_env)
   },
   error=function(cond) {
-    message(paste("There is no current package with identifier ",
+    message(paste("There is no current package with identifier",
                   datasetid))
     message("A new package must be created in the EDI environment")
     message("Here's the original error message:")
-    message(cond)
+    message(conditionMessage(cond))
     # Choose a return value (should be zero)
     return(0)
   },

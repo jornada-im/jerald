@@ -164,13 +164,13 @@ publish_dataset <- function(datasetid, repository, data_path,
       },
       # Return any warnings
       warning = function(w) {
-        message(paste("There was a warning publishing package ", datasetid))
+        message(paste("There was a warning publishing package", datasetid))
         message(conditionMessage(w))
         NULL
       },
       # Return any errors
       error = function(e) {
-        message(paste("There was an error publishing package ", datasetid))
+        message(paste("There was an error publishing package", datasetid))
         message(conditionMessage(e))
         NA
       }
